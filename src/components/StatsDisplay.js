@@ -6,11 +6,9 @@ import {
   CardContent,
   Grid,
   Chip,
-  LinearProgress,
   Stack,
   Divider,
-  useTheme,
-  useMediaQuery
+  useTheme
 } from '@mui/material';
 import {
   TrendingUp as TrendingIcon,
@@ -23,7 +21,6 @@ import {
 
 function StatsDisplay({ stats, compact = false }) {
   const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   if (!stats || stats.totalPlayed === 0) {
     return (

@@ -10,7 +10,6 @@ import {
   Chip,
   Alert,
   Divider,
-  IconButton,
   useTheme,
   useMediaQuery,
   Stack,
@@ -18,7 +17,6 @@ import {
 } from '@mui/material';
 import {
   Home as HomeIcon,
-  Share as ShareIcon,
   CheckCircle as CorrectIcon,
   Cancel as WrongIcon,
   WhatsApp as WhatsAppIcon,
@@ -35,7 +33,7 @@ function ResultsPage() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { results, quiz, answers } = location.state || {};
+  const { results, quiz } = location.state || {};
   const userStats = getFormattedStats();
 
   if (!results || !quiz) {

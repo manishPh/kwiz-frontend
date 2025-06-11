@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -8,7 +8,6 @@ import {
   Button,
   Grid,
   Chip,
-  Alert,
   CircularProgress,
   useTheme,
   useMediaQuery,
@@ -29,11 +28,9 @@ function HomePage() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const isTablet = useMediaQuery(theme.breakpoints.down('md'));
 
   const [todayQuiz, setTodayQuiz] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [quizStatus, setQuizStatus] = useState(null);
 
   const today = new Date().toISOString().split('T')[0];
@@ -66,11 +63,7 @@ function HomePage() {
     return 'https://static.toiimg.com/thumb/msid-119610150,imgsize-82628,width-400,resizemode-4/119610150.jpg';
   };
 
-  useEffect(() => {
-    loadTodayQuiz();
-  }, []);
-
-  const loadTodayQuiz = async () => {
+  const loadTodayQuiz = useCallback(async () => {
     try {
       setLoading(true);
 
@@ -116,14 +109,18 @@ function HomePage() {
         }
       } catch (quizErr) {
         // Both failed, show error but also try to get next quiz info
-        setError(err.error || quizErr.error || 'Failed to load today\'s quiz');
+        console.error('Failed to load quiz:', err, quizErr);
         setTodayQuiz(null);
         setQuizStatus(null);
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [today]);
+
+  useEffect(() => {
+    loadTodayQuiz();
+  }, [loadTodayQuiz]);
 
   const handleStartQuiz = () => {
     navigate(`/quiz/${today}`);

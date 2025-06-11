@@ -78,23 +78,19 @@ function HomePage() {
       if (hasCompletedToday) {
         // User already completed today's quiz, show timer for next quiz
         setTodayQuiz(null);
-        setError(null);
         console.log('User has completed today\'s quiz, showing timer for next quiz');
       } else if (status.is_available) {
         // Quiz is available and user hasn't completed it, load it
         const quiz = await quizAPI.getDailyQuiz(today);
         setTodayQuiz(quiz);
-        setError(null);
         console.log('Loading today\'s quiz for first-time user');
       } else if (status.error && status.next_quiz) {
         // No quiz today but next quiz available, show timer
         setTodayQuiz(null);
-        setError(null);
         console.log('No quiz today, showing timer for next quiz');
       } else {
         // Quiz not available yet, show timer
         setTodayQuiz(null);
-        setError(null);
         console.log('Quiz not available, showing timer');
       }
     } catch (err) {
@@ -105,10 +101,9 @@ function HomePage() {
           const quiz = await quizAPI.getDailyQuiz(today);
           setTodayQuiz(quiz);
           setQuizStatus({ is_available: true });
-          setError(null);
         }
       } catch (quizErr) {
-        // Both failed, show error but also try to get next quiz info
+        // Both failed, log error
         console.error('Failed to load quiz:', err, quizErr);
         setTodayQuiz(null);
         setQuizStatus(null);

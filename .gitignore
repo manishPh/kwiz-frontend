@@ -1,0 +1,225 @@
+# Frontend (React/Node.js)
+kwiz-frontend/node_modules/
+kwiz-frontend/build/
+kwiz-frontend/dist/
+kwiz-frontend/.env
+kwiz-frontend/.env.local
+kwiz-frontend/.env.development.local
+kwiz-frontend/.env.test.local
+kwiz-frontend/.env.production.local
+kwiz-frontend/npm-debug.log*
+kwiz-frontend/yarn-debug.log*
+kwiz-frontend/yarn-error.log*
+kwiz-frontend/.DS_Store
+
+# Backend (Django/Python)
+kwiz-backend/__pycache__/
+kwiz-backend/*/__pycache__/
+kwiz-backend/*/*/__pycache__/
+kwiz-backend/*.pyc
+kwiz-backend/*/*.pyc
+kwiz-backend/*/*/*.pyc
+kwiz-backend/*.pyo
+kwiz-backend/*.pyd
+kwiz-backend/.Python
+kwiz-backend/env/
+kwiz-backend/venv/
+kwiz-backend/.venv/
+kwiz-backend/ENV/
+kwiz-backend/env.bak/
+kwiz-backend/venv.bak/
+
+# Django specific
+kwiz-backend/db.sqlite3
+kwiz-backend/db.sqlite3-journal
+kwiz-backend/media/
+kwiz-backend/staticfiles/
+kwiz-backend/.env
+kwiz-backend/local_settings.py
+kwiz-backend/celerybeat-schedule
+kwiz-backend/celerybeat.pid
+
+# Quiz configurations (optional - you might want to track these)
+kwiz-backend/quiz_configs/imported/
+kwiz-backend/quiz_configs/pending/*.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+.env.production
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Python virtual environments
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# pyenv
+.python-version
+
+# celery beat schedule file
+celerybeat-schedule
+
+# SageMath parsed files
+*.sage.py
+
+# Spyder project settings
+.spyderproject
+.spyproject
+
+# Rope project settings
+.ropeproject
+
+# mkdocs documentation
+/site
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Test files (optional - you might want to track these)
+test_*.html
+*_test.html
+demo_*.html
+
+# Backup files
+*.bak
+*.backup
+*~

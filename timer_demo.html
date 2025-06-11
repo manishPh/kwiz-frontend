@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kwiz Timer Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .title {
+            color: #e91e63;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .timer-card {
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            border: 2px solid #e91e63;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .timer-title {
+            color: #e91e63;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .quiz-title {
+            color: #333;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .countdown {
+            font-size: 3em;
+            font-weight: 800;
+            color: #e91e63;
+            font-family: monospace;
+            letter-spacing: 3px;
+            margin: 20px 0;
+        }
+
+        .message {
+            color: #666;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .info-chips {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        .chip {
+            background: #e91e63;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .chip.secondary {
+            background: #ff9800;
+        }
+
+        .status {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .status h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .status pre {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: left;
+            overflow-x: auto;
+            font-size: 0.9em;
+            border: 1px solid #ddd;
+        }
+
+        .refresh-btn {
+            background: #e91e63;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .refresh-btn:hover {
+            background: #c2185b;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .countdown {
+                font-size: 2em;
+            }
+
+            .title {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title">🎬 Kwiz.com</h1>
+        <p class="subtitle">Timer System Demo</p>
+
+        <div id="timerSection" class="timer-card">
+            <div class="timer-title">⏰ Next Kwiz Coming Soon</div>
+            <div id="quizTitle" class="quiz-title">Loading...</div>
+
+            <!-- Performance Display (when completed) -->
+            <div id="performanceSection" style="display: none; margin: 20px 0;">
+                <div style="color: #e91e63; font-size: 1.2em; margin-bottom: 10px;">✅ Kwiz Completed!</div>
+                <div id="scoreDisplay" style="font-size: 2.5em; font-weight: 800; color: #e91e63; margin: 10px 0;">8/10
+                </div>
+                <div id="percentageDisplay" style="font-size: 1.3em; font-weight: 600; color: #e91e63;">80% Score</div>
+                <div id="encouragementMessage" style="color: #666; margin-top: 5px;">🎉 Excellent!</div>
+            </div>
+
+            <div id="countdown" class="countdown">--:--:--</div>
+            <div id="message" class="message">Loading timer...</div>
+            <div class="info-chips">
+                <span class="chip">🕐 Releases at 12:00 AM IST</span>
+                <span id="categoryChip" class="chip secondary">🎬 Loading...</span>
+            </div>
+        </div>
+
+        <div class="status">
+            <h3>📡 API Response:</h3>
+            <pre id="apiResponse">Loading...</pre>
+        </div>
+
+        <div class="status">
+            <h3>🔍 Frontend Logic Test:</h3>
+            <pre id="logicTest">Loading...</pre>
+        </div>
+
+        <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+            <button class="refresh-btn" onclick="loadQuizStatus()">🔄 Refresh Status</button>
+            <button class="refresh-btn" onclick="toggleCompletion()" style="background: #ff9800;">
+                🔄 Toggle Completion
+            </button>
+        </div>
+
+        <div class="status">
+            <h3>💾 localStorage Status:</h3>
+            <pre id="localStorageStatus">Loading...</pre>
+        </div>
+    </div>
+
+    <script>
+        let countdownInterval;
+        let timeLeft = 0;
+
+        function formatTime(seconds) {
+            if (seconds <= 0) return '00:00:00';
+
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const secs = seconds % 60;
+
+            return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function getTimeMessage(seconds) {
+            if (seconds <= 0) return "Quiz should be available now! Refreshing...";
+            if (seconds < 3600) return "Coming very soon!";
+            if (seconds < 86400) return "Coming today!";
+            return "Coming soon!";
+        }
+
+        function startCountdown(initialTime) {
+            timeLeft = initialTime;
+
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+            }
+
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById('countdown').textContent = formatTime(timeLeft);
+                document.getElementById('message').textContent = getTimeMessage(timeLeft);
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    document.getElementById('message').textContent = "Quiz should be available now! Refreshing...";
+                    setTimeout(loadQuizStatus, 2000);
+                }
+            }, 1000);
+        }
+
+        function updateLocalStorageStatus() {
+            const today = new Date().toISOString().split('T')[0];
+            const hasCompleted = localStorage.getItem(`quiz_completed_${today}`) === 'true';
+            const resultsData = localStorage.getItem(`quiz_results_${today}`);
+
+            let results = null;
+            try {
+                results = resultsData ? JSON.parse(resultsData) : null;
+            } catch (e) {
+                results = 'Invalid JSON';
+            }
+
+            const status = {
+                'today': today,
+                'quiz_completed': hasCompleted,
+                'quiz_results': results,
+                'localStorage_keys': {
+                    'completion': `quiz_completed_${today}`,
+                    'results': `quiz_results_${today}`
+                }
+            };
+
+            document.getElementById('localStorageStatus').textContent = JSON.stringify(status, null, 2);
+        }
+
+        function toggleCompletion() {
+            const today = new Date().toISOString().split('T')[0];
+            const hasCompleted = localStorage.getItem(`quiz_completed_${today}`) === 'true';
+
+            if (hasCompleted) {
+                localStorage.removeItem(`quiz_completed_${today}`);
+                localStorage.removeItem(`quiz_results_${today}`);
+                console.log('Removed completion status and results');
+            } else {
+                localStorage.setItem(`quiz_completed_${today}`, 'true');
+                // Add sample results for testing
+                localStorage.setItem(`quiz_results_${today}`, JSON.stringify({
+                    score: 8,
+                    total: 10,
+                    percentage: 80,
+                    completedAt: new Date().toISOString()
+                }));
+                console.log('Set completion status with sample results');
+            }
+
+            updateLocalStorageStatus();
+            loadQuizStatus();
+        }
+
+        async function loadQuizStatus() {
+            try {
+                const response = await fetch('http://localhost:8000/api/quiz/status/');
+                const data = await response.json();
+
+                document.getElementById('apiResponse').textContent = JSON.stringify(data, null, 2);
+
+                // Test frontend logic with localStorage
+                const today = new Date().toISOString().split('T')[0];
+                const hasCompleted = localStorage.getItem(`quiz_completed_${today}`) === 'true';
+
+                const logicTest = {
+                    'quizStatus exists': !!data,
+                    'has error': !!data.error,
+                    'has next_quiz': !!data.next_quiz,
+                    'is_available': data.is_available,
+                    'user_completed_today': hasCompleted,
+                    'should_show_timer': hasCompleted || !!(data && (data.is_available === false || data.error) && data.next_quiz),
+                    'should_show_quiz': !hasCompleted && data.is_available
+                };
+                document.getElementById('logicTest').textContent = JSON.stringify(logicTest, null, 2);
+
+                updateLocalStorageStatus();
+
+                // Check if user completed today's quiz
+                const today = new Date().toISOString().split('T')[0];
+                const hasCompleted = localStorage.getItem(`quiz_completed_${today}`) === 'true';
+                const resultsData = localStorage.getItem(`quiz_results_${today}`);
+
+                let results = null;
+                try {
+                    results = resultsData ? JSON.parse(resultsData) : null;
+                } catch (e) {
+                    console.error('Error parsing results:', e);
+                }
+
+                // Show/hide performance section
+                const performanceSection = document.getElementById('performanceSection');
+                if (hasCompleted && results) {
+                    performanceSection.style.display = 'block';
+                    document.getElementById('scoreDisplay').textContent = `${results.score}/${results.total}`;
+                    document.getElementById('percentageDisplay').textContent = `${results.percentage}% Score`;
+
+                    // Set color and message based on performance
+                    const color = results.percentage >= 80 ? '#4caf50' :
+                        results.percentage >= 60 ? '#ff9800' : '#f44336';
+                    const message = results.percentage >= 80 ? '🎉 Excellent!' :
+                        results.percentage >= 60 ? '👍 Good job!' : '💪 Keep practicing!';
+
+                    document.getElementById('scoreDisplay').style.color = color;
+                    document.getElementById('percentageDisplay').style.color = color;
+                    document.getElementById('encouragementMessage').textContent = message;
+                } else {
+                    performanceSection.style.display = 'none';
+                }
+
+                if (data.next_quiz) {
+                    document.getElementById('quizTitle').textContent = data.next_quiz.title;
+                    document.getElementById('categoryChip').textContent = `🎬 ${data.next_quiz.category}`;
+
+                    if (data.next_quiz.time_until_release > 0) {
+                        startCountdown(data.next_quiz.time_until_release);
+                    } else {
+                        document.getElementById('countdown').textContent = '00:00:00';
+                        document.getElementById('message').textContent = 'Quiz should be available now!';
+                    }
+                } else {
+                    document.getElementById('quizTitle').textContent = 'No upcoming quiz';
+                    document.getElementById('countdown').textContent = '--:--:--';
+                    document.getElementById('message').textContent = 'Check back later';
+                }
+            } catch (error) {
+                console.error('Error loading quiz status:', error);
+                document.getElementById('apiResponse').textContent = `Error: ${error.message}`;
+                document.getElementById('message').textContent = 'Failed to load quiz status';
+            }
+        }
+
+        // Load initial status
+        loadQuizStatus();
+
+        // Refresh every 30 seconds
+        setInterval(loadQuizStatus, 30000);
+    </script>
+</body>
+
+</html>

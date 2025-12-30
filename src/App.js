@@ -7,6 +7,7 @@ import QuizPage from './pages/QuizPage';
 import ResultsPage from './pages/ResultsPage';
 import ArchivePage from './pages/ArchivePage';
 import AnalyticsPage from './pages/AnalyticsPage';
+import { DOMAIN, APP_FULL_NAME } from './constants';
 
 function App() {
   const theme = useTheme();
@@ -36,7 +37,7 @@ function App() {
               fontWeight: 600
             }}
           >
-            {isMobile ? 'Kwiz.com' : 'Kwiz.com - Daily Fresh Trivia'}
+            {isMobile ? DOMAIN : APP_FULL_NAME}
           </Typography>
         </Toolbar>
       </AppBar>

@@ -23,6 +23,13 @@ import {
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
 import QuizTimer from '../components/QuizTimer';
+import {
+  DOMAIN,
+  UI_TEXT,
+  QUIZ_TIMER_LABEL,
+  QUIZ_NEW_BADGE,
+  BACKGROUND_IMAGES
+} from '../constants';
 
 function HomePage() {
   const navigate = useNavigate();
@@ -177,7 +184,7 @@ function HomePage() {
             mb: { xs: 1, sm: 2 }
           }}
         >
-          🎬 Welcome to Kwiz.com
+          {UI_TEXT.WELCOME_TITLE}
         </Typography>
         <Typography
           variant="h6"
@@ -188,7 +195,7 @@ function HomePage() {
             mb: { xs: 1, sm: 2 }
           }}
         >
-          Your daily dose of fresh trivia
+          {UI_TEXT.WELCOME_SUBTITLE}
         </Typography>
         <Typography
           variant="body1"
@@ -199,7 +206,7 @@ function HomePage() {
             mx: 'auto'
           }}
         >
-          New quizzes every day based on what's happening now and special occasions
+          {UI_TEXT.WELCOME_DESCRIPTION}
         </Typography>
       </Box>
 
@@ -319,10 +326,10 @@ function HomePage() {
                     textShadow: todayQuiz ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none'
                   }}
                 >
-                  Today's Kwiz
+                  {QUIZ_TIMER_LABEL}
                 </Typography>
                 <Chip
-                  label="NEW"
+                  label={QUIZ_NEW_BADGE}
                   color="secondary"
                   size={isMobile ? "small" : "medium"}
                   sx={{

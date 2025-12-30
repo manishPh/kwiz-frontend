@@ -26,6 +26,16 @@ import {
 } from '@mui/icons-material';
 import StatsDisplay from '../components/StatsDisplay';
 import { getFormattedStats } from '../utils/statsManager';
+import {
+  DOMAIN,
+  SHARE_TEXT_SUFFIX,
+  SHARE_TEXT_INSTAGRAM_SUFFIX,
+  SHARE_CLIPBOARD_SUCCESS,
+  SHARE_INSTAGRAM_INSTRUCTION,
+  SOCIAL_MEDIA,
+  SCORE_EMOJI,
+  SCORE_THRESHOLDS
+} from '../constants';
 
 function ResultsPage() {
   const location = useLocation();
@@ -60,37 +70,36 @@ function ResultsPage() {
   };
 
   const getScoreEmoji = (percentage) => {
-    if (percentage >= 90) return '🏆';
-    if (percentage >= 80) return '🌟';
-    if (percentage >= 70) return '👏';
-    if (percentage >= 60) return '👍';
-    return '💪';
+    if (percentage >= SCORE_THRESHOLDS.EXCELLENT) return SCORE_EMOJI.EXCELLENT;
+    if (percentage >= SCORE_THRESHOLDS.GREAT) return SCORE_EMOJI.GREAT;
+    if (percentage >= SCORE_THRESHOLDS.GOOD) return SCORE_EMOJI.GOOD;
+    if (percentage >= SCORE_THRESHOLDS.OKAY) return SCORE_EMOJI.OKAY;
+    return SCORE_EMOJI.TRY_AGAIN;
   };
 
   const shareOnWhatsApp = () => {
-    const text = encodeURIComponent(results.share_text + '\n\nPlay daily Bollywood trivia at kwiz.com 🎬');
-    const url = `https://wa.me/?text=${text}`;
+    const text = encodeURIComponent(results.share_text + SHARE_TEXT_SUFFIX);
+    const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${text}`;
     window.open(url, '_blank');
   };
 
   const shareOnFacebook = () => {
-    const text = encodeURIComponent(results.share_text + '\n\nPlay daily Bollywood trivia at kwiz.com');
-    const url = `https://www.facebook.com/sharer/sharer.php?u=kwiz.com&quote=${text}`;
+    const text = encodeURIComponent(results.share_text + SHARE_TEXT_SUFFIX);
+    const url = `${SOCIAL_MEDIA.FACEBOOK.SHARE_URL}u=${DOMAIN}&quote=${text}`;
     window.open(url, '_blank');
   };
 
   const shareOnInstagram = () => {
     // Instagram doesn't support direct text sharing via URL, so we copy to clipboard
-    const text = results.share_text + '\n\nPlay daily Bollywood trivia at kwiz.com 🎬✨';
+    const text = results.share_text + SHARE_TEXT_INSTAGRAM_SUFFIX;
     navigator.clipboard.writeText(text);
-    // You could show a toast notification here saying "Copied to clipboard! Open Instagram to share"
-    alert('Text copied to clipboard! Open Instagram and paste in your story or post.');
+    alert(SHARE_INSTAGRAM_INSTRUCTION);
   };
 
   const copyToClipboard = () => {
-    const text = results.share_text + '\n\nPlay daily Bollywood trivia at kwiz.com 🎬';
+    const text = results.share_text + SHARE_TEXT_SUFFIX;
     navigator.clipboard.writeText(text);
-    alert('Results copied to clipboard!');
+    alert(SHARE_CLIPBOARD_SUCCESS);
   };
 
   return (
@@ -191,13 +200,13 @@ function ResultsPage() {
               size={isMobile ? "medium" : "large"}
               fullWidth={isMobile}
               sx={{
-                backgroundColor: '#25D366',
+                backgroundColor: SOCIAL_MEDIA.WHATSAPP.COLOR,
                 color: 'white',
                 borderRadius: 2,
                 py: { xs: 1.5, sm: 2 },
                 fontWeight: 600,
                 '&:hover': {
-                  backgroundColor: '#128C7E'
+                  backgroundColor: SOCIAL_MEDIA.WHATSAPP.HOVER_COLOR
                 }
               }}
             >
@@ -210,13 +219,13 @@ function ResultsPage() {
               size={isMobile ? "medium" : "large"}
               fullWidth={isMobile}
               sx={{
-                backgroundColor: '#1877F2',
+                backgroundColor: SOCIAL_MEDIA.FACEBOOK.COLOR,
                 color: 'white',
                 borderRadius: 2,
                 py: { xs: 1.5, sm: 2 },
                 fontWeight: 600,
                 '&:hover': {
-                  backgroundColor: '#166FE5'
+                  backgroundColor: SOCIAL_MEDIA.FACEBOOK.HOVER_COLOR
                 }
               }}
             >

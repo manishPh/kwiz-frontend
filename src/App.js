@@ -12,7 +12,6 @@ import QuizPage from './pages/QuizPage';
 import ResultsPage from './pages/ResultsPage';
 import ArchivePage from './pages/ArchivePage';
 import AnalyticsPage from './pages/AnalyticsPage';
-import DebugPage from './pages/DebugPage';
 import { DOMAIN, APP_FULL_NAME } from './constants';
 
 function App() {
@@ -182,7 +181,6 @@ function App() {
             <Route path="/results" element={<ResultsPage />} />
             <Route path="/archive" element={<ArchivePage />} />
             <Route path="/analytics" element={<AnalyticsPage />} />
-            <Route path="/debug" element={<DebugPage />} />
           </Routes>
         </Container>
       </Box>

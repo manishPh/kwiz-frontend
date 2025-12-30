@@ -10,7 +10,8 @@ import {
   Chip,
   useTheme,
   useMediaQuery,
-  Stack
+  Stack,
+  CircularProgress
 } from '@mui/material';
 import {
   PlayArrow as PlayIcon,
@@ -22,7 +23,6 @@ import {
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
 import QuizTimer from '../components/QuizTimer';
-import FilmReelLoader from '../components/FilmReelLoader';
 import {
   UI_TEXT,
   QUIZ_TIMER_LABEL,
@@ -156,7 +156,11 @@ function HomePage() {
   };
 
   if (loading) {
-    return <FilmReelLoader message="Loading your Bollywood challenge..." />;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={60} />
+      </Box>
+    );
   }
 
   return (

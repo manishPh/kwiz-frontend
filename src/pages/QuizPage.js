@@ -16,7 +16,8 @@ import {
   useTheme,
   useMediaQuery,
   Stack,
-  Paper
+  Paper,
+  CircularProgress
 } from '@mui/material';
 import {
   NavigateNext as NextIcon,
@@ -26,7 +27,6 @@ import {
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
 import { updateStatsAfterQuiz } from '../utils/statsManager';
-import FilmReelLoader from '../components/FilmReelLoader';
 
 function QuizPage() {
   const { date } = useParams();
@@ -122,7 +122,11 @@ function QuizPage() {
   };
 
   if (loading) {
-    return <FilmReelLoader message="Preparing your quiz..." />;
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={60} />
+      </Box>
+    );
   }
 
   if (error) {

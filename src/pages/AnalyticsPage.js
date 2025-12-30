@@ -28,11 +28,20 @@ function AnalyticsPage() {
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 } }}>
       <Fade in timeout={600}>
-        <Box>
+        <Box
+          sx={{
+            backgroundColor: 'rgba(40, 40, 45, 0.75)',
+            backdropFilter: 'blur(10px)',
+            borderRadius: { xs: 2, sm: 3 },
+            p: { xs: 2, sm: 3, md: 4 },
+            border: '1px solid rgba(233, 30, 99, 0.3)',
+            boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.25)',
+          }}
+        >
           {/* Breadcrumbs */}
-          <Breadcrumbs 
-            aria-label="breadcrumb" 
-            sx={{ 
+          <Breadcrumbs
+            aria-label="breadcrumb"
+            sx={{
               mb: { xs: 2, sm: 3 },
               '& .MuiBreadcrumbs-separator': {
                 color: 'text.secondary'
@@ -58,12 +67,12 @@ function AnalyticsPage() {
               <HomeIcon fontSize="small" />
               Home
             </Link>
-            <Typography 
-              color="text.primary" 
+            <Typography
+              color="text.primary"
               variant="body2"
-              sx={{ 
-                display: 'flex', 
-                alignItems: 'center', 
+              sx={{
+                display: 'flex',
+                alignItems: 'center',
                 gap: 0.5,
                 fontWeight: 600
               }}
@@ -74,14 +83,14 @@ function AnalyticsPage() {
           </Breadcrumbs>
 
           {/* Header */}
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               mb: { xs: 3, sm: 4 },
               textAlign: { xs: 'center', sm: 'left' }
             }}
           >
-            <Typography 
-              variant="h3" 
+            <Typography
+              variant="h3"
               component="h1"
               gutterBottom
               sx={{
@@ -96,8 +105,8 @@ function AnalyticsPage() {
             >
               Your Kwiz Analytics
             </Typography>
-            <Typography 
-              variant="h6" 
+            <Typography
+              variant="h6"
               color="text.secondary"
               sx={{
                 fontSize: { xs: '1rem', sm: '1.1rem' },
@@ -109,8 +118,8 @@ function AnalyticsPage() {
             </Typography>
 
             {/* Quick Actions */}
-            <Box 
-              sx={{ 
+            <Box
+              sx={{
                 display: 'flex',
                 gap: 2,
                 justifyContent: { xs: 'center', sm: 'flex-start' },
@@ -152,8 +161,8 @@ function AnalyticsPage() {
           <StatsDisplay stats={userStats} compact={false} />
 
           {/* Bottom Navigation */}
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               mt: { xs: 4, sm: 6 },
               pt: 3,
               borderTop: '1px solid',
@@ -196,15 +205,15 @@ function AnalyticsPage() {
           </Box>
 
           {/* Footer Note */}
-          <Box 
-            sx={{ 
+          <Box
+            sx={{
               mt: 4,
               textAlign: 'center',
               py: 2
             }}
           >
-            <Typography 
-              variant="body2" 
+            <Typography
+              variant="body2"
               color="text.secondary"
               sx={{ fontSize: '0.875rem' }}
             >

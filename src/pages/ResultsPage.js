@@ -103,20 +103,46 @@ function ResultsPage() {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        backgroundColor: 'rgba(40, 40, 45, 0.75)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: { xs: 2, sm: 3 },
+        p: { xs: 2, sm: 3, md: 4 },
+        border: '1px solid rgba(233, 30, 99, 0.3)',
+        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.25)',
+        '@keyframes celebrationPop': {
+          '0%': { transform: 'scale(0.8)', opacity: 0 },
+          '50%': { transform: 'scale(1.05)' },
+          '100%': { transform: 'scale(1)', opacity: 1 },
+        },
+        '@keyframes slideUp': {
+          from: { opacity: 0, transform: 'translateY(30px)' },
+          to: { opacity: 1, transform: 'translateY(0)' },
+        },
+      }}
+    >
       {/* Results Header */}
       <Card
         elevation={isMobile ? 2 : 3}
         sx={{
           mb: { xs: 2, sm: 3 },
           textAlign: 'center',
-          background: 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)',
-          border: '1px solid',
-          borderColor: 'divider'
+          animation: 'celebrationPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
         }}
       >
         <CardContent>
-          <Typography variant="h4" gutterBottom>
+          <Typography
+            variant="h3"
+            gutterBottom
+            sx={{
+              fontFamily: '"Bebas Neue", sans-serif',
+              background: 'linear-gradient(135deg, #e91e63 0%, #ff9800 50%, #ffd700 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+            }}
+          >
             Kwiz Complete! {getScoreEmoji(results.percentage)}
           </Typography>
           <Typography variant="h6" color="text.secondary" gutterBottom>

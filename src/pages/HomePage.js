@@ -8,7 +8,6 @@ import {
   Button,
   Grid,
   Chip,
-  CircularProgress,
   useTheme,
   useMediaQuery,
   Stack
@@ -23,12 +22,11 @@ import {
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
 import QuizTimer from '../components/QuizTimer';
+import FilmReelLoader from '../components/FilmReelLoader';
 import {
-  DOMAIN,
   UI_TEXT,
   QUIZ_TIMER_LABEL,
   QUIZ_NEW_BADGE,
-  BACKGROUND_IMAGES
 } from '../constants';
 
 function HomePage() {
@@ -158,30 +156,49 @@ function HomePage() {
   };
 
   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
-    );
+    return <FilmReelLoader message="Loading your Bollywood challenge..." />;
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        backgroundColor: 'rgba(40, 40, 45, 0.75)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: { xs: 2, sm: 3 },
+        p: { xs: 2, sm: 3, md: 4 },
+        border: '1px solid rgba(233, 30, 99, 0.3)',
+        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.25)',
+        '@keyframes fadeIn': {
+          from: { opacity: 0, transform: 'translateY(20px)' },
+          to: { opacity: 1, transform: 'translateY(0)' },
+        },
+        animation: 'fadeIn 0.6s ease-out',
+      }}
+    >
       {/* Hero Section */}
       <Box
         textAlign="center"
         mb={{ xs: 3, sm: 4 }}
         px={{ xs: 1, sm: 2 }}
+        sx={{
+          '@keyframes slideDown': {
+            from: { opacity: 0, transform: 'translateY(-30px)' },
+            to: { opacity: 1, transform: 'translateY(0)' },
+          },
+          animation: 'slideDown 0.8s ease-out',
+        }}
       >
         <Typography
-          variant="h3"
+          variant="h2"
           component="h1"
           gutterBottom
-          color="primary"
           sx={{
-            fontSize: { xs: '1.8rem', sm: '2.2rem', md: '2.5rem' },
-            fontWeight: 700,
-            mb: { xs: 1, sm: 2 }
+            mb: { xs: 1, sm: 2 },
+            background: 'linear-gradient(135deg, #e91e63 0%, #ff9800 50%, #ffd700 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            textShadow: '0 0 30px rgba(233, 30, 99, 0.3)',
           }}
         >
           {UI_TEXT.WELCOME_TITLE}
@@ -286,7 +303,7 @@ function HomePage() {
                 bottom: 0,
                 background: todayQuiz
                   ? 'linear-gradient(135deg, rgba(233, 30, 99, 0.85) 0%, rgba(255, 152, 0, 0.75) 100%)'
-                  : 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)',
+                  : 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
                 zIndex: 1
               }
             }}
@@ -296,7 +313,7 @@ function HomePage() {
                 p: { xs: 2, sm: 3 },
                 position: 'relative',
                 zIndex: 2,
-                color: todayQuiz ? 'white' : 'inherit',
+                color: 'white',
                 height: '100%',
                 display: 'flex',
                 flexDirection: 'column'
@@ -312,7 +329,7 @@ function HomePage() {
                 <MovieIcon
                   sx={{
                     fontSize: { xs: '1.5rem', sm: '1.75rem' },
-                    color: todayQuiz ? 'white' : 'primary.main'
+                    color: 'white'
                   }}
                 />
                 <Typography
@@ -322,8 +339,8 @@ function HomePage() {
                     fontSize: { xs: '1.3rem', sm: '1.5rem', md: '1.75rem' },
                     fontWeight: 600,
                     flex: 1,
-                    color: todayQuiz ? 'white' : 'inherit',
-                    textShadow: todayQuiz ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none'
+                    color: 'white',
+                    textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
                   }}
                 >
                   {QUIZ_TIMER_LABEL}
@@ -350,8 +367,8 @@ function HomePage() {
                       fontSize: { xs: '1.1rem', sm: '1.25rem' },
                       fontWeight: 600,
                       mb: { xs: 1, sm: 2 },
-                      color: todayQuiz ? 'white' : 'inherit',
-                      textShadow: todayQuiz ? '1px 1px 2px rgba(0,0,0,0.5)' : 'none'
+                      color: 'white',
+                      textShadow: '1px 1px 2px rgba(0,0,0,0.5)'
                     }}
                   >
                     {todayQuiz.title}
@@ -376,15 +393,15 @@ function HomePage() {
                       <QuizIcon
                         sx={{
                           fontSize: { xs: '1rem', sm: '1.1rem' },
-                          color: todayQuiz ? 'rgba(255,255,255,0.9)' : 'text.secondary'
+                          color: 'rgba(255,255,255,0.9)'
                         }}
                       />
                       <Typography
                         variant="body2"
                         sx={{
                           fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                          color: todayQuiz ? 'rgba(255,255,255,0.9)' : 'text.secondary',
-                          textShadow: todayQuiz ? '1px 1px 1px rgba(0,0,0,0.3)' : 'none'
+                          color: 'rgba(255,255,255,0.9)',
+                          textShadow: '1px 1px 1px rgba(0,0,0,0.3)'
                         }}
                       >
                         {todayQuiz.questions?.length || 10} questions
@@ -394,15 +411,15 @@ function HomePage() {
                       <TimeIcon
                         sx={{
                           fontSize: { xs: '1rem', sm: '1.1rem' },
-                          color: todayQuiz ? 'rgba(255,255,255,0.9)' : 'text.secondary'
+                          color: 'rgba(255,255,255,0.9)'
                         }}
                       />
                       <Typography
                         variant="body2"
                         sx={{
                           fontSize: { xs: '0.8rem', sm: '0.875rem' },
-                          color: todayQuiz ? 'rgba(255,255,255,0.9)' : 'text.secondary',
-                          textShadow: todayQuiz ? '1px 1px 1px rgba(0,0,0,0.3)' : 'none'
+                          color: 'rgba(255,255,255,0.9)',
+                          textShadow: '1px 1px 1px rgba(0,0,0,0.3)'
                         }}
                       >
                         5-10 minutes
@@ -417,8 +434,8 @@ function HomePage() {
                       fontSize: { xs: '0.9rem', sm: '1rem' },
                       lineHeight: 1.6,
                       mb: { xs: 2, sm: 3 },
-                      color: todayQuiz ? 'rgba(255,255,255,0.95)' : 'inherit',
-                      textShadow: todayQuiz ? '1px 1px 1px rgba(0,0,0,0.3)' : 'none'
+                      color: 'rgba(255,255,255,0.95)',
+                      textShadow: '1px 1px 1px rgba(0,0,0,0.3)'
                     }}
                   >
                     {todayQuiz.description}

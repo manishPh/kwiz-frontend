@@ -88,10 +88,29 @@ function ArchivePage() {
   }
 
   return (
-    <Box>
+    <Box
+      sx={{
+        backgroundColor: 'rgba(40, 40, 45, 0.75)',
+        backdropFilter: 'blur(10px)',
+        borderRadius: { xs: 2, sm: 3 },
+        p: { xs: 2, sm: 3, md: 4 },
+        border: '1px solid rgba(233, 30, 99, 0.3)',
+        boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.25)',
+      }}
+    >
       {/* Header */}
       <Box mb={4}>
-        <Typography variant="h4" gutterBottom>
+        <Typography
+          variant="h4"
+          gutterBottom
+          sx={{
+            background: 'linear-gradient(135deg, #e91e63 0%, #ff9800 100%)',
+            backgroundClip: 'text',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            fontWeight: 700,
+          }}
+        >
           Kwiz Archive
         </Typography>
         <Typography variant="body1" color="text.secondary">

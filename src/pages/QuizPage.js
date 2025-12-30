@@ -12,7 +12,6 @@ import {
   FormControl,
   LinearProgress,
   Alert,
-  CircularProgress,
   Chip,
   useTheme,
   useMediaQuery,
@@ -27,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
 import { updateStatsAfterQuiz } from '../utils/statsManager';
+import FilmReelLoader from '../components/FilmReelLoader';
 
 function QuizPage() {
   const { date } = useParams();
@@ -122,11 +122,7 @@ function QuizPage() {
   };
 
   if (loading) {
-    return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
-        <CircularProgress />
-      </Box>
-    );
+    return <FilmReelLoader message="Preparing your quiz..." />;
   }
 
   if (error) {
@@ -168,7 +164,8 @@ function QuizPage() {
           p: { xs: 2, sm: 3 },
           mb: { xs: 2, sm: 3 },
           borderRadius: { xs: 2, sm: 3 },
-          background: 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)'
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+          color: 'white'
         }}
       >
         <Typography
@@ -229,7 +226,8 @@ function QuizPage() {
           mb: { xs: 3, sm: 4 },
           borderRadius: { xs: 2, sm: 3 },
           overflow: 'hidden',
-          background: 'linear-gradient(135deg, #fff 0%, #f8f9fa 100%)'
+          background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+          color: 'white'
         }}
       >
         <CardContent sx={{ p: { xs: 2, sm: 3, md: 4 } }}>
@@ -240,7 +238,8 @@ function QuizPage() {
               fontSize: { xs: '1.1rem', sm: '1.25rem', md: '1.4rem' },
               fontWeight: 600,
               lineHeight: 1.4,
-              mb: { xs: 2, sm: 3 }
+              mb: { xs: 2, sm: 3 },
+              color: 'white'
             }}
           >
             {question.text}
@@ -258,15 +257,15 @@ function QuizPage() {
                   elevation={0}
                   sx={{
                     border: '2px solid',
-                    borderColor: answers[question.id] === option ? 'primary.main' : 'grey.200',
+                    borderColor: answers[question.id] === option ? 'primary.main' : 'grey.700',
                     borderRadius: 2,
                     mb: { xs: 1, sm: 1.5 },
                     transition: 'all 0.2s ease-in-out',
+                    backgroundColor: answers[question.id] === option ? 'rgba(233, 30, 99, 0.2)' : 'rgba(255, 255, 255, 0.05)',
                     '&:hover': {
                       borderColor: 'primary.light',
-                      backgroundColor: 'primary.50'
-                    },
-                    backgroundColor: answers[question.id] === option ? 'primary.50' : 'transparent'
+                      backgroundColor: answers[question.id] === option ? 'rgba(233, 30, 99, 0.3)' : 'rgba(255, 255, 255, 0.1)'
+                    }
                   }}
                 >
                   <FormControlLabel
@@ -314,37 +313,6 @@ function QuizPage() {
           zIndex: 10
         }}
       >
-        {/* Progress Dots */}
-        <Box
-          display="flex"
-          justifyContent="center"
-          gap={{ xs: 0.5, sm: 1 }}
-          mb={{ xs: 2, sm: 3 }}
-          flexWrap="wrap"
-        >
-          {quiz.questions.map((_, index) => (
-            <Box
-              key={index}
-              sx={{
-                width: { xs: 10, sm: 12 },
-                height: { xs: 10, sm: 12 },
-                borderRadius: '50%',
-                backgroundColor: answers[quiz.questions[index].id]
-                  ? 'success.main'
-                  : index === currentQuestion
-                    ? 'primary.main'
-                    : 'grey.300',
-                cursor: 'pointer',
-                transition: 'all 0.2s ease-in-out',
-                '&:hover': {
-                  transform: 'scale(1.2)'
-                }
-              }}
-              onClick={() => setCurrentQuestion(index)}
-            />
-          ))}
-        </Box>
-
         {/* Navigation Buttons */}
         <Stack
           direction="row"
@@ -360,7 +328,26 @@ function QuizPage() {
             size={isMobile ? "medium" : "large"}
             sx={{
               minWidth: { xs: 80, sm: 120 },
-              py: { xs: 1, sm: 1.5 }
+              py: { xs: 1, sm: 1.5 },
+              borderColor: '#e91e63',
+              borderWidth: 2,
+              color: '#e91e63',
+              backgroundColor: 'rgba(233, 30, 99, 0.1)',
+              fontWeight: 600,
+              '&:hover': {
+                borderColor: '#ff9800',
+                borderWidth: 2,
+                color: '#ff9800',
+                backgroundColor: 'rgba(255, 152, 0, 0.2)',
+                transform: 'translateY(-2px)',
+                boxShadow: '0 4px 12px rgba(233, 30, 99, 0.4)'
+              },
+              '&:disabled': {
+                borderColor: 'grey.700',
+                color: 'grey.600',
+                backgroundColor: 'transparent'
+              },
+              transition: 'all 0.2s ease-in-out'
             }}
           >
             {isMobile ? 'Back' : 'Previous'}
@@ -377,11 +364,26 @@ function QuizPage() {
                 minWidth: { xs: 100, sm: 140 },
                 py: { xs: 1.5, sm: 2 },
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                fontWeight: 600,
-                boxShadow: 3,
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #4caf50 0%, #66bb6a 100%)',
+                color: '#ffffff !important',
+                border: 'none',
+                boxShadow: '0 4px 14px 0 rgba(76, 175, 80, 0.5)',
                 '&:hover': {
-                  boxShadow: 6
-                }
+                  background: 'linear-gradient(135deg, #388e3c 0%, #4caf50 100%)',
+                  boxShadow: '0 6px 20px 0 rgba(76, 175, 80, 0.6)',
+                  transform: 'translateY(-2px)'
+                },
+                '&:disabled': {
+                  background: 'linear-gradient(135deg, #424242 0%, #616161 100%) !important',
+                  color: '#9e9e9e !important',
+                  boxShadow: 'none',
+                  opacity: 0.6
+                },
+                '& .MuiButton-startIcon': {
+                  color: '#ffffff'
+                },
+                transition: 'all 0.2s ease-in-out'
               }}
             >
               {submitting ? 'Submitting...' : (isMobile ? 'Submit' : 'Submit Kwiz')}
@@ -397,11 +399,26 @@ function QuizPage() {
                 minWidth: { xs: 80, sm: 120 },
                 py: { xs: 1.5, sm: 2 },
                 fontSize: { xs: '0.9rem', sm: '1rem' },
-                fontWeight: 600,
-                boxShadow: 3,
+                fontWeight: 700,
+                background: 'linear-gradient(135deg, #e91e63 0%, #ff9800 100%)',
+                color: '#ffffff !important',
+                border: 'none',
+                boxShadow: '0 4px 14px 0 rgba(233, 30, 99, 0.5)',
                 '&:hover': {
-                  boxShadow: 6
-                }
+                  background: 'linear-gradient(135deg, #c2185b 0%, #f57c00 100%)',
+                  boxShadow: '0 6px 20px 0 rgba(233, 30, 99, 0.6)',
+                  transform: 'translateY(-2px)'
+                },
+                '&:disabled': {
+                  background: 'linear-gradient(135deg, #424242 0%, #616161 100%) !important',
+                  color: '#9e9e9e !important',
+                  boxShadow: 'none',
+                  opacity: 0.6
+                },
+                '& .MuiButton-endIcon': {
+                  color: '#ffffff'
+                },
+                transition: 'all 0.2s ease-in-out'
               }}
             >
               {isMobile ? 'Next' : 'Next'}

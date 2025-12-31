@@ -140,21 +140,24 @@ function HomePage(): React.JSX.Element {
     try {
       setLoading(true);
 
-      // Check if user has already completed today's quiz
-      const hasCompletedToday = localStorage.getItem(`quiz_completed_${today}`) === 'true';
-
       // First check quiz status (don't pass date, let backend determine today)
       const status = await quizAPI.getQuizStatus();
       console.log('Quiz status:', status);
       setQuizStatus(status);
+
+      // Use the quiz_date from backend status response (server's "today")
+      const serverToday = status.quiz_date;
+
+      // Check if user has already completed today's quiz (using server's date)
+      const hasCompletedToday = localStorage.getItem(`quiz_completed_${serverToday}`) === 'true';
 
       if (hasCompletedToday) {
         // User already completed today's quiz, show timer for next quiz
         setTodayQuiz(null);
         console.log('User has completed today\'s quiz, showing timer for next quiz');
       } else if (status.is_available) {
-        // Quiz is available and user hasn't completed it, load it
-        const quiz = await quizAPI.getDailyQuiz(today);
+        // Quiz is available and user hasn't completed it, load it using server's date
+        const quiz = await quizAPI.getDailyQuiz(serverToday);
         setTodayQuiz(quiz);
         console.log('Loading today\'s quiz for first-time user');
       } else if (status.error && status.next_quiz) {

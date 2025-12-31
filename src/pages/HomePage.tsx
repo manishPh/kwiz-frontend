@@ -56,9 +56,9 @@ function HomePage(): React.JSX.Element {
   const [todayQuiz, setTodayQuiz] = useState<DailyQuiz | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [quizStatus, setQuizStatus] = useState<QuizStatus | null>(null);
+  const [serverToday, setServerToday] = useState<string | null>(null);
 
-  // Get today's date in user's local timezone
-  // Users worldwide see the quiz for "their today" based on their local time
+  // Get today's date in user's local timezone (fallback only)
   const getTodayLocal = (): string => {
     const d = new Date();
     const year = d.getFullYear();
@@ -66,7 +66,7 @@ function HomePage(): React.JSX.Element {
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-  const today = getTodayLocal();
+  const today = serverToday || getTodayLocal(); // Use server's date if available, fallback to local
 
   // Social sharing functions
   const getScoreEmoji = (percentage: number): string => {
@@ -145,11 +145,12 @@ function HomePage(): React.JSX.Element {
       console.log('Quiz status:', status);
       setQuizStatus(status);
 
-      // Use the quiz_date from backend status response (server's "today")
-      const serverToday = status.quiz_date;
+      // Use the quiz_date from backend status response (server's "today" in IST)
+      const todayFromServer = status.quiz_date;
+      setServerToday(todayFromServer); // Store server's date in state
 
       // Check if user has already completed today's quiz (using server's date)
-      const hasCompletedToday = localStorage.getItem(`quiz_completed_${serverToday}`) === 'true';
+      const hasCompletedToday = localStorage.getItem(`quiz_completed_${todayFromServer}`) === 'true';
 
       if (hasCompletedToday) {
         // User already completed today's quiz, show timer for next quiz
@@ -157,7 +158,7 @@ function HomePage(): React.JSX.Element {
         console.log('User has completed today\'s quiz, showing timer for next quiz');
       } else if (status.is_available) {
         // Quiz is available and user hasn't completed it, load it using server's date
-        const quiz = await quizAPI.getDailyQuiz(serverToday);
+        const quiz = await quizAPI.getDailyQuiz(todayFromServer);
         setTodayQuiz(quiz);
         console.log('Loading today\'s quiz for first-time user');
       } else if (status.error && status.next_quiz) {
@@ -170,20 +171,22 @@ function HomePage(): React.JSX.Element {
         console.log('Quiz not available, showing timer');
       }
     } catch (err) {
-      // If status check fails, try to load quiz directly (fallback)
+      // If status check fails, try to load quiz directly (fallback to local date)
       try {
-        const hasCompletedToday = localStorage.getItem(`quiz_completed_${today}`) === 'true';
+        const localToday = getTodayLocal();
+        const hasCompletedToday = localStorage.getItem(`quiz_completed_${localToday}`) === 'true';
         if (!hasCompletedToday) {
-          const quiz = await quizAPI.getDailyQuiz(today);
+          const quiz = await quizAPI.getDailyQuiz(localToday);
           setTodayQuiz(quiz);
+          setServerToday(localToday);
           setQuizStatus({
-            quiz_date: today,
+            quiz_date: localToday,
             quiz_title: quiz.title,
             category: quiz.category_name,
             is_available: true,
             time_until_release: 0,
             next_quiz: null,
-            release_time: today
+            release_time: localToday
           });
         }
       } catch (quizErr) {
@@ -195,7 +198,7 @@ function HomePage(): React.JSX.Element {
     } finally {
       setLoading(false);
     }
-  }, [today]);
+  }, []);
 
   useEffect(() => {
     loadTodayQuiz();

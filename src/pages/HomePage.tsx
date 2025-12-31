@@ -19,24 +19,15 @@ import {
   Movie as MovieIcon,
   AccessTime as TimeIcon,
   Quiz as QuizIcon,
-  Analytics as AnalyticsIcon,
-  WhatsApp as WhatsAppIcon,
-  Facebook as FacebookIcon,
-  Instagram as InstagramIcon,
-  ContentCopy as CopyIcon
+  Analytics as AnalyticsIcon
 } from '@mui/icons-material';
 import { quizAPI, DailyQuiz, QuizStatus } from '../services/api';
 import QuizTimer from '../components/QuizTimer';
+import ShareButtons from '../components/ShareButtons';
 import {
   UI_TEXT,
   QUIZ_TIMER_LABEL,
   QUIZ_NEW_BADGE,
-  DOMAIN_URL,
-  SHARE_TEXT_SUFFIX,
-  SHARE_TEXT_INSTAGRAM_SUFFIX,
-  SHARE_CLIPBOARD_SUCCESS,
-  SHARE_INSTAGRAM_INSTRUCTION,
-  SOCIAL_MEDIA,
   SCORE_EMOJI,
   SCORE_THRESHOLDS
 } from '../constants';
@@ -68,7 +59,7 @@ function HomePage(): React.JSX.Element {
   };
   const today = serverToday || getTodayLocal(); // Use server's date if available, fallback to local
 
-  // Social sharing functions
+  // Helper function to get score emoji
   const getScoreEmoji = (percentage: number): string => {
     if (percentage >= SCORE_THRESHOLDS.EXCELLENT) return SCORE_EMOJI.EXCELLENT;
     if (percentage >= SCORE_THRESHOLDS.GREAT) return SCORE_EMOJI.GREAT;
@@ -77,30 +68,10 @@ function HomePage(): React.JSX.Element {
     return SCORE_EMOJI.TRY_AGAIN;
   };
 
-  const shareOnWhatsApp = (score: number, total: number, percentage: number): void => {
+  // Helper function to generate share text
+  const getShareText = (score: number, total: number, percentage: number): string => {
     const emoji = getScoreEmoji(percentage);
-    const text = `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!\n\n${SHARE_TEXT_SUFFIX}`;
-    const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${encodeURIComponent(text)}`;
-    window.open(url, '_blank');
-  };
-
-  const shareOnFacebook = (): void => {
-    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(DOMAIN_URL)}`;
-    window.open(url, '_blank');
-  };
-
-  const shareOnInstagram = (score: number, total: number, percentage: number): void => {
-    const emoji = getScoreEmoji(percentage);
-    const text = `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!\n\n${SHARE_TEXT_INSTAGRAM_SUFFIX}`;
-    navigator.clipboard.writeText(text);
-    alert(SHARE_INSTAGRAM_INSTRUCTION);
-  };
-
-  const copyToClipboard = (score: number, total: number, percentage: number): void => {
-    const emoji = getScoreEmoji(percentage);
-    const text = `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!\n\n${SHARE_TEXT_SUFFIX}`;
-    navigator.clipboard.writeText(text);
-    alert(SHARE_CLIPBOARD_SUCCESS);
+    return `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!`;
   };
 
   // Helper function to get contextual background image based on quiz category/theme
@@ -625,69 +596,11 @@ function HomePage(): React.JSX.Element {
                             >
                               Share your score:
                             </Typography>
-                            <Stack
-                              direction="row"
+                            <ShareButtons
+                              shareText={getShareText(results!.score, results!.total, results!.percentage)}
+                              iconSize={38}
                               spacing={3}
-                              justifyContent="center"
-                              alignItems="center"
-                            >
-                              <Box
-                                onClick={() => shareOnWhatsApp(results!.score, results!.total, results!.percentage)}
-                                sx={{
-                                  cursor: 'pointer',
-                                  color: '#25D366',
-                                  transition: 'all 0.2s',
-                                  '&:hover': {
-                                    transform: 'scale(1.2)',
-                                    color: '#128C7E'
-                                  }
-                                }}
-                              >
-                                <WhatsAppIcon sx={{ fontSize: 38 }} />
-                              </Box>
-                              <Box
-                                onClick={() => shareOnFacebook()}
-                                sx={{
-                                  cursor: 'pointer',
-                                  color: '#1877F2',
-                                  transition: 'all 0.2s',
-                                  '&:hover': {
-                                    transform: 'scale(1.2)',
-                                    color: '#0C63D4'
-                                  }
-                                }}
-                              >
-                                <FacebookIcon sx={{ fontSize: 38 }} />
-                              </Box>
-                              <Box
-                                onClick={() => shareOnInstagram(results!.score, results!.total, results!.percentage)}
-                                sx={{
-                                  cursor: 'pointer',
-                                  color: '#E4405F',
-                                  transition: 'all 0.2s',
-                                  '&:hover': {
-                                    transform: 'scale(1.2)',
-                                    color: '#C13584'
-                                  }
-                                }}
-                              >
-                                <InstagramIcon sx={{ fontSize: 38 }} />
-                              </Box>
-                              <Box
-                                onClick={() => copyToClipboard(results!.score, results!.total, results!.percentage)}
-                                sx={{
-                                  cursor: 'pointer',
-                                  color: 'grey.400',
-                                  transition: 'all 0.2s',
-                                  '&:hover': {
-                                    transform: 'scale(1.2)',
-                                    color: 'grey.300'
-                                  }
-                                }}
-                              >
-                                <CopyIcon sx={{ fontSize: 38 }} />
-                              </Box>
-                            </Stack>
+                            />
                           </Box>
                         </Box>
                       )}

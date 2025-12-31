@@ -12,27 +12,17 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-  Stack,
   Paper
 } from '@mui/material';
 import {
   Home as HomeIcon,
   CheckCircle as CorrectIcon,
-  Cancel as WrongIcon,
-  WhatsApp as WhatsAppIcon,
-  Facebook as FacebookIcon,
-  Instagram as InstagramIcon,
-  ContentCopy as CopyIcon
+  Cancel as WrongIcon
 } from '@mui/icons-material';
 import StatsDisplay from '../components/StatsDisplay';
+import ShareButtons from '../components/ShareButtons';
 import { getFormattedStats } from '../utils/statsManager';
 import {
-  DOMAIN,
-  SHARE_TEXT_SUFFIX,
-  SHARE_TEXT_INSTAGRAM_SUFFIX,
-  SHARE_CLIPBOARD_SUCCESS,
-  SHARE_INSTAGRAM_INSTRUCTION,
-  SOCIAL_MEDIA,
   SCORE_EMOJI,
   SCORE_THRESHOLDS
 } from '../constants';
@@ -75,31 +65,6 @@ function ResultsPage(): React.JSX.Element {
     if (percentage >= SCORE_THRESHOLDS.GOOD) return SCORE_EMOJI.GOOD;
     if (percentage >= SCORE_THRESHOLDS.OKAY) return SCORE_EMOJI.OKAY;
     return SCORE_EMOJI.TRY_AGAIN;
-  };
-
-  const shareOnWhatsApp = (): void => {
-    const text = encodeURIComponent(results.share_text + SHARE_TEXT_SUFFIX);
-    const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${text}`;
-    window.open(url, '_blank');
-  };
-
-  const shareOnFacebook = (): void => {
-    const text = encodeURIComponent(results.share_text + SHARE_TEXT_SUFFIX);
-    const url = `${SOCIAL_MEDIA.FACEBOOK.SHARE_URL}u=${DOMAIN}&quote=${text}`;
-    window.open(url, '_blank');
-  };
-
-  const shareOnInstagram = (): void => {
-    // Instagram doesn't support direct text sharing via URL, so we copy to clipboard
-    const text = results.share_text + SHARE_TEXT_INSTAGRAM_SUFFIX;
-    navigator.clipboard.writeText(text);
-    alert(SHARE_INSTAGRAM_INSTRUCTION);
-  };
-
-  const copyToClipboard = (): void => {
-    const text = results.share_text + SHARE_TEXT_SUFFIX;
-    navigator.clipboard.writeText(text);
-    alert(SHARE_CLIPBOARD_SUCCESS);
   };
 
   return (
@@ -176,9 +141,9 @@ function ResultsPage(): React.JSX.Element {
         sx={{
           mb: { xs: 2, sm: 3 },
           borderRadius: { xs: 2, sm: 3 },
-          background: 'linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(248,249,250,0.95) 100%)',
+          background: 'linear-gradient(145deg, #2a2a2a 0%, #3a3a3a 100%)',
           backdropFilter: 'blur(10px)',
-          border: '1px solid rgba(255,255,255,0.2)'
+          border: '1px solid rgba(233, 30, 99, 0.3)'
         }}
       >
         <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
@@ -187,7 +152,8 @@ function ResultsPage(): React.JSX.Element {
             gutterBottom
             sx={{
               fontSize: { xs: '1.1rem', sm: '1.25rem' },
-              fontWeight: 600
+              fontWeight: 600,
+              color: 'white'
             }}
           >
             Share Your Results
@@ -196,120 +162,32 @@ function ResultsPage(): React.JSX.Element {
             elevation={0}
             sx={{
               p: { xs: 1.5, sm: 2 },
-              backgroundColor: 'grey.50',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
               borderRadius: 2,
-              mb: { xs: 2, sm: 3 }
+              mb: { xs: 2, sm: 3 },
+              border: '1px solid rgba(255, 255, 255, 0.2)'
             }}
           >
             <Typography
               variant="body2"
-              color="text.secondary"
               sx={{
                 fontSize: { xs: '0.85rem', sm: '0.875rem' },
                 fontFamily: 'monospace',
-                textAlign: 'center'
+                textAlign: 'center',
+                color: 'rgba(255, 255, 255, 0.9)'
               }}
             >
               {results.share_text}
             </Typography>
           </Paper>
 
-          <Stack
-            direction={{ xs: 'column', sm: 'row' }}
-            spacing={{ xs: 1.5, sm: 2 }}
-            sx={{ mt: 2 }}
-          >
-            <Button
-              variant="contained"
-              startIcon={<WhatsAppIcon />}
-              onClick={shareOnWhatsApp}
-              size={isMobile ? "medium" : "large"}
-              fullWidth={isMobile}
-              sx={{
-                backgroundColor: SOCIAL_MEDIA.WHATSAPP.COLOR,
-                color: 'white',
-                borderRadius: 2,
-                py: { xs: 1.5, sm: 2 },
-                fontWeight: 600,
-                '&:hover': {
-                  backgroundColor: SOCIAL_MEDIA.WHATSAPP.HOVER_COLOR
-                }
-              }}
-            >
-              WhatsApp
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<FacebookIcon />}
-              onClick={shareOnFacebook}
-              size={isMobile ? "medium" : "large"}
-              fullWidth={isMobile}
-              sx={{
-                backgroundColor: SOCIAL_MEDIA.FACEBOOK.COLOR,
-                color: 'white',
-                borderRadius: 2,
-                py: { xs: 1.5, sm: 2 },
-                fontWeight: 600,
-                '&:hover': {
-                  backgroundColor: SOCIAL_MEDIA.FACEBOOK.HOVER_COLOR
-                }
-              }}
-            >
-              Facebook
-            </Button>
-            <Button
-              variant="contained"
-              startIcon={<InstagramIcon />}
-              onClick={shareOnInstagram}
-              size={isMobile ? "medium" : "large"}
-              fullWidth={isMobile}
-              sx={{
-                background: 'linear-gradient(45deg, #F56040 0%, #E1306C 25%, #C13584 50%, #833AB4 75%, #5851DB 100%)',
-                color: 'white',
-                borderRadius: 2,
-                py: { xs: 1.5, sm: 2 },
-                fontWeight: 600,
-                '&:hover': {
-                  opacity: 0.9
-                }
-              }}
-            >
-              Instagram
-            </Button>
-            {!isMobile && (
-              <Button
-                variant="outlined"
-                startIcon={<CopyIcon />}
-                onClick={copyToClipboard}
-                size="large"
-                sx={{
-                  borderRadius: 2,
-                  py: 2,
-                  minWidth: 100
-                }}
-              >
-                Copy
-              </Button>
-            )}
-          </Stack>
-
-          {isMobile && (
-            <Button
-              variant="outlined"
-              startIcon={<CopyIcon />}
-              onClick={copyToClipboard}
-              size="medium"
-              fullWidth
-              sx={{
-                borderRadius: 2,
-                py: 1.5,
-                mt: 1.5,
-                fontWeight: 500
-              }}
-            >
-              Copy to Clipboard
-            </Button>
-          )}
+          <Box sx={{ mt: 2 }}>
+            <ShareButtons
+              shareText={results.share_text}
+              iconSize={isMobile ? 36 : 42}
+              spacing={isMobile ? 2 : 3}
+            />
+          </Box>
         </CardContent>
       </Card>
 

@@ -14,7 +14,7 @@ import ArchivePage from './pages/ArchivePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import { DOMAIN, APP_FULL_NAME } from './constants';
 
-function App() {
+function App(): React.JSX.Element {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();

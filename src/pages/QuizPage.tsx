@@ -25,29 +25,35 @@ import {
   ArrowBack as BackIcon,
   Quiz as QuizIcon
 } from '@mui/icons-material';
-import { quizAPI } from '../services/api';
+import { quizAPI, DailyQuiz } from '../services/api';
 import { updateStatsAfterQuiz } from '../utils/statsManager';
 
-function QuizPage() {
-  const { date } = useParams();
+interface AnswersMap {
+  [questionId: string]: string;
+}
+
+function QuizPage(): React.JSX.Element {
+  const { date } = useParams<{ date: string }>();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [quiz, setQuiz] = useState(null);
-  const [currentQuestion, setCurrentQuestion] = useState(0);
-  const [answers, setAnswers] = useState({});
-  const [loading, setLoading] = useState(true);
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState(null);
+  const [quiz, setQuiz] = useState<DailyQuiz | null>(null);
+  const [currentQuestion, setCurrentQuestion] = useState<number>(0);
+  const [answers, setAnswers] = useState<AnswersMap>({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [submitting, setSubmitting] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const loadQuiz = useCallback(async () => {
+    if (!date) return;
+
     try {
       setLoading(true);
       const quizData = await quizAPI.getDailyQuiz(date);
       setQuiz(quizData);
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.error || 'Failed to load quiz');
     } finally {
       setLoading(false);
@@ -58,26 +64,28 @@ function QuizPage() {
     loadQuiz();
   }, [loadQuiz]);
 
-  const handleAnswerChange = (questionId, answer) => {
+  const handleAnswerChange = (questionId: number | string, answer: string): void => {
     setAnswers(prev => ({
       ...prev,
-      [questionId]: answer
+      [questionId.toString()]: answer
     }));
   };
 
-  const handleNext = () => {
-    if (currentQuestion < quiz.questions.length - 1) {
+  const handleNext = (): void => {
+    if (quiz && currentQuestion < quiz.questions.length - 1) {
       setCurrentQuestion(prev => prev + 1);
     }
   };
 
-  const handlePrevious = () => {
+  const handlePrevious = (): void => {
     if (currentQuestion > 0) {
       setCurrentQuestion(prev => prev - 1);
     }
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (): Promise<void> => {
+    if (!date || !quiz) return;
+
     try {
       setSubmitting(true);
 
@@ -114,7 +122,7 @@ function QuizPage() {
           answers
         }
       });
-    } catch (err) {
+    } catch (err: any) {
       setError(err.error || 'Failed to submit quiz');
     } finally {
       setSubmitting(false);
@@ -251,7 +259,7 @@ function QuizPage() {
 
           <FormControl component="fieldset" fullWidth>
             <RadioGroup
-              value={answers[question.id] || ''}
+              value={answers[question.id.toString()] || ''}
               onChange={(e) => handleAnswerChange(question.id, e.target.value)}
               sx={{ gap: { xs: 0.5, sm: 1 } }}
             >
@@ -261,14 +269,14 @@ function QuizPage() {
                   elevation={0}
                   sx={{
                     border: '2px solid',
-                    borderColor: answers[question.id] === option ? 'primary.main' : 'grey.700',
+                    borderColor: answers[question.id.toString()] === option ? 'primary.main' : 'grey.700',
                     borderRadius: 2,
                     mb: { xs: 1, sm: 1.5 },
                     transition: 'all 0.2s ease-in-out',
-                    backgroundColor: answers[question.id] === option ? 'rgba(233, 30, 99, 0.2)' : 'rgba(255, 255, 255, 0.05)',
+                    backgroundColor: answers[question.id.toString()] === option ? 'rgba(233, 30, 99, 0.2)' : 'rgba(255, 255, 255, 0.05)',
                     '&:hover': {
                       borderColor: 'primary.light',
-                      backgroundColor: answers[question.id] === option ? 'rgba(233, 30, 99, 0.3)' : 'rgba(255, 255, 255, 0.1)'
+                      backgroundColor: answers[question.id.toString()] === option ? 'rgba(233, 30, 99, 0.3)' : 'rgba(255, 255, 255, 0.1)'
                     }
                   }}
                 >
@@ -397,7 +405,7 @@ function QuizPage() {
               variant="contained"
               endIcon={<NextIcon />}
               onClick={handleNext}
-              disabled={!answers[question.id]}
+              disabled={!answers[question.id.toString()]}
               size={isMobile ? "medium" : "large"}
               sx={{
                 minWidth: { xs: 80, sm: 120 },
@@ -435,3 +443,4 @@ function QuizPage() {
 }
 
 export default QuizPage;
+

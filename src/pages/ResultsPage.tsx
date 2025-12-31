@@ -26,6 +26,7 @@ import {
 } from '@mui/icons-material';
 import StatsDisplay from '../components/StatsDisplay';
 import { getFormattedStats } from '../utils/statsManager';
+import { QuestionResult } from '../services/api';
 import {
   DOMAIN,
   SHARE_TEXT_SUFFIX,
@@ -37,13 +38,13 @@ import {
   SCORE_THRESHOLDS
 } from '../constants';
 
-function ResultsPage() {
+function ResultsPage(): React.JSX.Element {
   const location = useLocation();
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { results, quiz } = location.state || {};
+  const { results, quiz } = (location.state as any) || {};
   const userStats = getFormattedStats();
 
   if (!results || !quiz) {
@@ -63,13 +64,13 @@ function ResultsPage() {
     );
   }
 
-  const getScoreColor = (percentage) => {
+  const getScoreColor = (percentage: number): 'success' | 'warning' | 'error' => {
     if (percentage >= 80) return 'success';
     if (percentage >= 60) return 'warning';
     return 'error';
   };
 
-  const getScoreEmoji = (percentage) => {
+  const getScoreEmoji = (percentage: number): string => {
     if (percentage >= SCORE_THRESHOLDS.EXCELLENT) return SCORE_EMOJI.EXCELLENT;
     if (percentage >= SCORE_THRESHOLDS.GREAT) return SCORE_EMOJI.GREAT;
     if (percentage >= SCORE_THRESHOLDS.GOOD) return SCORE_EMOJI.GOOD;
@@ -77,26 +78,26 @@ function ResultsPage() {
     return SCORE_EMOJI.TRY_AGAIN;
   };
 
-  const shareOnWhatsApp = () => {
+  const shareOnWhatsApp = (): void => {
     const text = encodeURIComponent(results.share_text + SHARE_TEXT_SUFFIX);
     const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${text}`;
     window.open(url, '_blank');
   };
 
-  const shareOnFacebook = () => {
+  const shareOnFacebook = (): void => {
     const text = encodeURIComponent(results.share_text + SHARE_TEXT_SUFFIX);
     const url = `${SOCIAL_MEDIA.FACEBOOK.SHARE_URL}u=${DOMAIN}&quote=${text}`;
     window.open(url, '_blank');
   };
 
-  const shareOnInstagram = () => {
+  const shareOnInstagram = (): void => {
     // Instagram doesn't support direct text sharing via URL, so we copy to clipboard
     const text = results.share_text + SHARE_TEXT_INSTAGRAM_SUFFIX;
     navigator.clipboard.writeText(text);
     alert(SHARE_INSTAGRAM_INSTRUCTION);
   };
 
-  const copyToClipboard = () => {
+  const copyToClipboard = (): void => {
     const text = results.share_text + SHARE_TEXT_SUFFIX;
     navigator.clipboard.writeText(text);
     alert(SHARE_CLIPBOARD_SUCCESS);
@@ -157,7 +158,7 @@ function ResultsPage() {
               <Chip
                 label={`${results.percentage}%`}
                 color={getScoreColor(results.percentage)}
-                size="large"
+                size="medium"
               />
             </Box>
           </Box>
@@ -321,15 +322,20 @@ function ResultsPage() {
         Question Review
       </Typography>
 
-      {results.results.map((result, index) => {
-        const question = quiz.questions.find(q => q.id === result.question_id);
+      {results.results.map((result: any, index: number) => {
+        const question = quiz.questions.find((q: any) => q.id === result.question_id);
         if (!question) return null;
+
+        // Backend returns user_answer and correct_answer as actual values, not option letters
+        const userAnswer = result.user_answer || result.selected_option || '';
+        const correctAnswer = result.correct_answer;
+        const isCorrect = result.correct !== undefined ? result.correct : result.is_correct;
 
         return (
           <Card key={result.question_id} elevation={1} sx={{ mb: 2 }}>
             <CardContent>
               <Box display="flex" alignItems="flex-start" gap={2}>
-                {result.correct ? (
+                {isCorrect ? (
                   <CorrectIcon color="success" />
                 ) : (
                   <WrongIcon color="error" />
@@ -347,19 +353,19 @@ function ResultsPage() {
                       </Typography>
                       <Typography
                         variant="body1"
-                        color={result.correct ? 'success.main' : 'error.main'}
+                        color={isCorrect ? 'success.main' : 'error.main'}
                       >
-                        {result.user_answer || 'Not answered'}
+                        {userAnswer || 'Not answered'}
                       </Typography>
                     </Grid>
 
-                    {!result.correct && (
+                    {!isCorrect && (
                       <Grid item xs={12} sm={6}>
                         <Typography variant="body2" color="text.secondary">
                           Correct answer:
                         </Typography>
                         <Typography variant="body1" color="success.main">
-                          {result.correct_answer}
+                          {correctAnswer}
                         </Typography>
                       </Grid>
                     )}

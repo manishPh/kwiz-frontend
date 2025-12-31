@@ -2,8 +2,62 @@
 
 const STATS_KEY = 'kwiz-stats';
 
+// Type definitions
+export interface ScoreDistribution {
+  '0-5': number;
+  '6': number;
+  '7': number;
+  '8': number;
+  '9': number;
+  '10': number;
+}
+
+export interface CategoryStats {
+  played: number;
+  totalScore: number;
+  totalQuestions: number;
+  avgScore: number;
+  accuracy: number;
+}
+
+export interface CategoryStatsMap {
+  [category: string]: CategoryStats;
+}
+
+export interface UserStats {
+  totalPlayed: number;
+  totalCorrect: number;
+  totalQuestions: number;
+  accuracy: number;
+  currentStreak: number;
+  maxStreak: number;
+  categoryStats: CategoryStatsMap;
+  scoreDistribution: ScoreDistribution;
+  lastPlayed: string | null;
+  perfectScores: number;
+  averageScore: number;
+  bestCategory: string | null;
+  totalTimePlayed: number; // in minutes (estimated)
+  recentScore?: number;
+}
+
+export interface QuizResults {
+  score: number;
+  total: number;
+}
+
+export interface FormattedStats extends UserStats {
+  winPercentage: number;
+  averagePercentage: number;
+  gamesWithPerfectScore: number;
+  totalHoursPlayed: number;
+  categoriesPlayed: number;
+}
+
+type ScoreBucket = '0-5' | '6' | '7' | '8' | '9' | '10';
+
 // Initialize default stats structure
-const getDefaultStats = () => ({
+const getDefaultStats = (): UserStats => ({
   totalPlayed: 0,
   totalCorrect: 0,
   totalQuestions: 0,
@@ -27,12 +81,12 @@ const getDefaultStats = () => ({
 });
 
 // Get current stats from localStorage
-export const getStats = () => {
+export const getStats = (): UserStats => {
   try {
     const stored = localStorage.getItem(STATS_KEY);
     if (!stored) return getDefaultStats();
 
-    const stats = JSON.parse(stored);
+    const stats = JSON.parse(stored) as UserStats;
     // Merge with defaults to handle new fields
     return { ...getDefaultStats(), ...stats };
   } catch (error) {
@@ -42,7 +96,7 @@ export const getStats = () => {
 };
 
 // Save stats to localStorage
-const saveStats = (stats) => {
+const saveStats = (stats: UserStats): void => {
   try {
     localStorage.setItem(STATS_KEY, JSON.stringify(stats));
   } catch (error) {
@@ -51,7 +105,7 @@ const saveStats = (stats) => {
 };
 
 // Get score distribution bucket based on actual score out of 10
-const getScoreBucket = (score, total) => {
+const getScoreBucket = (score: number, total: number): ScoreBucket => {
   // Convert to score out of 10
   const scoreOutOf10 = Math.round((score / total) * 10);
 
@@ -64,7 +118,7 @@ const getScoreBucket = (score, total) => {
 };
 
 // Update streak based on play dates
-const updateStreak = (stats, quizDate) => {
+const updateStreak = (stats: UserStats, quizDate: string): void => {
   const today = new Date(quizDate);
   const lastPlayed = stats.lastPlayed ? new Date(stats.lastPlayed) : null;
 
@@ -72,7 +126,7 @@ const updateStreak = (stats, quizDate) => {
     // First game ever
     stats.currentStreak = 1;
   } else {
-    const daysDiff = Math.floor((today - lastPlayed) / (1000 * 60 * 60 * 24));
+    const daysDiff = Math.floor((today.getTime() - lastPlayed.getTime()) / (1000 * 60 * 60 * 24));
 
     if (daysDiff === 1) {
       // Consecutive day
@@ -91,8 +145,10 @@ const updateStreak = (stats, quizDate) => {
   stats.lastPlayed = quizDate;
 };
 
+
+
 // Update category statistics
-const updateCategoryStats = (stats, category, score, total) => {
+const updateCategoryStats = (stats: UserStats, category: string, score: number, total: number): void => {
   if (!stats.categoryStats[category]) {
     stats.categoryStats[category] = {
       played: 0,
@@ -112,8 +168,8 @@ const updateCategoryStats = (stats, category, score, total) => {
 };
 
 // Find best performing category
-const updateBestCategory = (stats) => {
-  let bestCategory = null;
+const updateBestCategory = (stats: UserStats): void => {
+  let bestCategory: string | null = null;
   let bestAccuracy = 0;
 
   Object.entries(stats.categoryStats).forEach(([category, catStats]) => {
@@ -127,7 +183,7 @@ const updateBestCategory = (stats) => {
 };
 
 // Main function to update stats after quiz completion
-export const updateStatsAfterQuiz = (quizResults, quizDate, category) => {
+export const updateStatsAfterQuiz = (quizResults: QuizResults, quizDate: string, category: string): UserStats => {
   const stats = getStats();
 
   // Update basic stats
@@ -166,7 +222,7 @@ export const updateStatsAfterQuiz = (quizResults, quizDate, category) => {
 };
 
 // Get formatted stats for display
-export const getFormattedStats = () => {
+export const getFormattedStats = (): FormattedStats => {
   const stats = getStats();
 
   return {
@@ -182,20 +238,20 @@ export const getFormattedStats = () => {
 };
 
 // Reset all stats (for testing or user request)
-export const resetStats = () => {
+export const resetStats = (): UserStats => {
   localStorage.removeItem(STATS_KEY);
   return getDefaultStats();
 };
 
 // Export stats for sharing or backup
-export const exportStats = () => {
+export const exportStats = (): string => {
   return JSON.stringify(getStats(), null, 2);
 };
 
 // Import stats from backup
-export const importStats = (statsJson) => {
+export const importStats = (statsJson: string): boolean => {
   try {
-    const stats = JSON.parse(statsJson);
+    const stats = JSON.parse(statsJson) as UserStats;
     saveStats(stats);
     return true;
   } catch (error) {

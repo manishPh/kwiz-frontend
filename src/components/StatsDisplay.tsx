@@ -8,7 +8,8 @@ import {
   Chip,
   Stack,
   Divider,
-  useTheme
+  useTheme,
+  Theme
 } from '@mui/material';
 import {
   TrendingUp as TrendingIcon,
@@ -18,9 +19,29 @@ import {
   Star as StarIcon,
   Analytics as AnalyticsIcon
 } from '@mui/icons-material';
+import { UserStats, ScoreDistribution } from '../utils/statsManager';
 
-function StatsDisplay({ stats, compact = false }) {
-  const theme = useTheme();
+interface StatsDisplayProps {
+  stats: UserStats | null;
+  compact?: boolean;
+}
+
+interface StatCardProps {
+  icon: React.ReactNode;
+  title: string;
+  value: string | number;
+  subtitle?: string;
+  color?: 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info';
+}
+
+interface ScoreBarChartProps {
+  scoreDistribution: ScoreDistribution;
+  recentScore?: number;
+  totalPlayed: number;
+}
+
+function StatsDisplay({ stats, compact = false }: StatsDisplayProps): React.JSX.Element {
+  const theme: Theme = useTheme();
 
   if (!stats || stats.totalPlayed === 0) {
     return (
@@ -38,7 +59,7 @@ function StatsDisplay({ stats, compact = false }) {
     );
   }
 
-  const StatCard = ({ icon, title, value, subtitle, color = 'primary' }) => (
+  const StatCard = ({ icon, title, value, subtitle, color = 'primary' }: StatCardProps): React.JSX.Element => (
     <Card
       elevation={1}
       sx={{
@@ -78,11 +99,11 @@ function StatsDisplay({ stats, compact = false }) {
     </Card>
   );
 
-  const ScoreBarChart = ({ scoreDistribution, recentScore, totalPlayed }) => {
-    const scores = ['0-5', '6', '7', '8', '9', '10'];
+  const ScoreBarChart = ({ scoreDistribution, recentScore, totalPlayed }: ScoreBarChartProps): React.JSX.Element => {
+    const scores: Array<keyof ScoreDistribution> = ['0-5', '6', '7', '8', '9', '10'];
     const maxCount = Math.max(...Object.values(scoreDistribution), 1);
 
-    const getBarColor = (score) => {
+    const getBarColor = (score: keyof ScoreDistribution): string => {
       // Check if this bar represents the recent score
       const scoreNum = score === '0-5' ? 5 : parseInt(score);
       const recentScoreNum = recentScore || 0;
@@ -99,7 +120,7 @@ function StatsDisplay({ stats, compact = false }) {
       return theme.palette.error.light;
     };
 
-    const getScoreLabel = (score) => {
+    const getScoreLabel = (score: keyof ScoreDistribution): string => {
       if (score === '0-5') return '≤5';
       return score;
     };
@@ -123,6 +144,8 @@ function StatsDisplay({ stats, compact = false }) {
                     height: `${Math.max(height, 5)}%`,
                     backgroundColor: getBarColor(score),
                     borderRadius: '4px 4px 0 0',
+
+
                     transition: 'all 0.3s ease',
                     position: 'relative',
                     boxShadow: isRecent ? `0 0 8px ${theme.palette.primary.main}40` : 'none',
@@ -164,8 +187,6 @@ function StatsDisplay({ stats, compact = false }) {
                 >
                   {getScoreLabel(score)}
                 </Typography>
-
-
               </Box>
             );
           })}
@@ -177,7 +198,6 @@ function StatsDisplay({ stats, compact = false }) {
             Score out of 10
           </Typography>
         </Box>
-
       </Box>
     );
   };
@@ -283,6 +303,7 @@ function StatsDisplay({ stats, compact = false }) {
           />
         </Grid>
       </Grid>
+
 
       <Grid container spacing={{ xs: 2, sm: 3 }}>
         {/* Score Distribution */}

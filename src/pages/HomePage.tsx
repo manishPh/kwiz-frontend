@@ -19,29 +19,83 @@ import {
   Movie as MovieIcon,
   AccessTime as TimeIcon,
   Quiz as QuizIcon,
-  Analytics as AnalyticsIcon
+  Analytics as AnalyticsIcon,
+  WhatsApp as WhatsAppIcon,
+  Facebook as FacebookIcon,
+  Instagram as InstagramIcon,
+  ContentCopy as CopyIcon
 } from '@mui/icons-material';
-import { quizAPI } from '../services/api';
+import { quizAPI, DailyQuiz, QuizStatus } from '../services/api';
 import QuizTimer from '../components/QuizTimer';
 import {
   UI_TEXT,
   QUIZ_TIMER_LABEL,
   QUIZ_NEW_BADGE,
+  DOMAIN_URL,
+  SHARE_TEXT_SUFFIX,
+  SHARE_TEXT_INSTAGRAM_SUFFIX,
+  SHARE_CLIPBOARD_SUCCESS,
+  SHARE_INSTAGRAM_INSTRUCTION,
+  SOCIAL_MEDIA,
+  SCORE_EMOJI,
+  SCORE_THRESHOLDS
 } from '../constants';
 
-function HomePage() {
+interface QuizResults {
+  score: number;
+  total: number;
+  percentage: number;
+  completedAt: string;
+}
+
+function HomePage(): React.JSX.Element {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [todayQuiz, setTodayQuiz] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [quizStatus, setQuizStatus] = useState(null);
+  const [todayQuiz, setTodayQuiz] = useState<DailyQuiz | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [quizStatus, setQuizStatus] = useState<QuizStatus | null>(null);
 
   const today = new Date().toISOString().split('T')[0];
 
+  // Social sharing functions
+  const getScoreEmoji = (percentage: number): string => {
+    if (percentage >= SCORE_THRESHOLDS.EXCELLENT) return SCORE_EMOJI.EXCELLENT;
+    if (percentage >= SCORE_THRESHOLDS.GREAT) return SCORE_EMOJI.GREAT;
+    if (percentage >= SCORE_THRESHOLDS.GOOD) return SCORE_EMOJI.GOOD;
+    if (percentage >= SCORE_THRESHOLDS.OKAY) return SCORE_EMOJI.OKAY;
+    return SCORE_EMOJI.TRY_AGAIN;
+  };
+
+  const shareOnWhatsApp = (score: number, total: number, percentage: number): void => {
+    const emoji = getScoreEmoji(percentage);
+    const text = `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!\n\n${SHARE_TEXT_SUFFIX}`;
+    const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${encodeURIComponent(text)}`;
+    window.open(url, '_blank');
+  };
+
+  const shareOnFacebook = (): void => {
+    const url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(DOMAIN_URL)}`;
+    window.open(url, '_blank');
+  };
+
+  const shareOnInstagram = (score: number, total: number, percentage: number): void => {
+    const emoji = getScoreEmoji(percentage);
+    const text = `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!\n\n${SHARE_TEXT_INSTAGRAM_SUFFIX}`;
+    navigator.clipboard.writeText(text);
+    alert(SHARE_INSTAGRAM_INSTRUCTION);
+  };
+
+  const copyToClipboard = (score: number, total: number, percentage: number): void => {
+    const emoji = getScoreEmoji(percentage);
+    const text = `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!\n\n${SHARE_TEXT_SUFFIX}`;
+    navigator.clipboard.writeText(text);
+    alert(SHARE_CLIPBOARD_SUCCESS);
+  };
+
   // Helper function to get contextual background image based on quiz category/theme
-  const getContextualBackground = (quiz) => {
+  const getContextualBackground = (quiz: DailyQuiz | null): string | null => {
     if (!quiz) return null;
 
     // You can expand this logic based on quiz themes, categories, or special events
@@ -105,7 +159,15 @@ function HomePage() {
         if (!hasCompletedToday) {
           const quiz = await quizAPI.getDailyQuiz(today);
           setTodayQuiz(quiz);
-          setQuizStatus({ is_available: true });
+          setQuizStatus({
+            quiz_date: today,
+            quiz_title: quiz.title,
+            category: quiz.category_name,
+            is_available: true,
+            time_until_release: 0,
+            next_quiz: null,
+            release_time: today
+          });
         }
       } catch (quizErr) {
         // Both failed, log error
@@ -122,27 +184,30 @@ function HomePage() {
     loadTodayQuiz();
   }, [loadTodayQuiz]);
 
-  const handleStartQuiz = () => {
+  const handleStartQuiz = (): void => {
     navigate(`/quiz/${today}`);
   };
 
-  const handleViewArchive = () => {
+  const handleViewArchive = (): void => {
     navigate('/archive');
   };
 
-  const handleViewAnalytics = () => {
+  const handleViewAnalytics = (): void => {
     navigate('/analytics');
   };
 
+
+
+
   // Debug functions for testing
-  const resetQuizCompletion = () => {
+  const resetQuizCompletion = (): void => {
     localStorage.removeItem(`quiz_completed_${today}`);
     localStorage.removeItem(`quiz_results_${today}`);
     console.log('Reset quiz completion status and results');
     loadTodayQuiz(); // Reload to show quiz
   };
 
-  const markQuizCompleted = () => {
+  const markQuizCompleted = (): void => {
     localStorage.setItem(`quiz_completed_${today}`, 'true');
     // Add sample results for testing
     localStorage.setItem(`quiz_results_${today}`, JSON.stringify({
@@ -285,6 +350,7 @@ function HomePage() {
             </Grid>
           );
         })()}
+
 
         {/* Today's Quiz */}
         <Grid item xs={12} md={8}>
@@ -470,13 +536,14 @@ function HomePage() {
                     Start Today's Kwiz
                   </Button>
                 </>
+
               ) : (() => {
                 const hasCompletedToday = localStorage.getItem(`quiz_completed_${today}`) === 'true';
 
-                if (hasCompletedToday && quizStatus?.next_quiz) {
+                if (hasCompletedToday) {
                   // Get stored quiz results
                   const storedResults = localStorage.getItem(`quiz_results_${today}`);
-                  let results = null;
+                  let results: QuizResults | null = null;
                   try {
                     results = storedResults ? JSON.parse(storedResults) : null;
                   } catch (e) {
@@ -528,35 +595,123 @@ function HomePage() {
                             {results.percentage >= 80 ? '🎉 Excellent!' :
                               results.percentage >= 60 ? '👍 Good job!' : '💪 Keep practicing!'}
                           </Typography>
+
+                          {/* Share Buttons */}
+                          <Box sx={{ mt: 3 }}>
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                              sx={{ mb: 1.5, fontSize: { xs: '0.85rem', sm: '0.9rem' } }}
+                            >
+                              Share your score:
+                            </Typography>
+                            <Stack
+                              direction="row"
+                              spacing={3}
+                              justifyContent="center"
+                              alignItems="center"
+                            >
+                              <Box
+                                onClick={() => shareOnWhatsApp(results.score, results.total, results.percentage)}
+                                sx={{
+                                  cursor: 'pointer',
+                                  color: '#25D366',
+                                  transition: 'all 0.2s',
+                                  '&:hover': {
+                                    transform: 'scale(1.2)',
+                                    color: '#128C7E'
+                                  }
+                                }}
+                              >
+                                <WhatsAppIcon sx={{ fontSize: 38 }} />
+                              </Box>
+                              <Box
+                                onClick={() => shareOnFacebook()}
+                                sx={{
+                                  cursor: 'pointer',
+                                  color: '#1877F2',
+                                  transition: 'all 0.2s',
+                                  '&:hover': {
+                                    transform: 'scale(1.2)',
+                                    color: '#0C63D4'
+                                  }
+                                }}
+                              >
+                                <FacebookIcon sx={{ fontSize: 38 }} />
+                              </Box>
+                              <Box
+                                onClick={() => shareOnInstagram(results.score, results.total, results.percentage)}
+                                sx={{
+                                  cursor: 'pointer',
+                                  color: '#E4405F',
+                                  transition: 'all 0.2s',
+                                  '&:hover': {
+                                    transform: 'scale(1.2)',
+                                    color: '#C13584'
+                                  }
+                                }}
+                              >
+                                <InstagramIcon sx={{ fontSize: 38 }} />
+                              </Box>
+                              <Box
+                                onClick={() => copyToClipboard(results.score, results.total, results.percentage)}
+                                sx={{
+                                  cursor: 'pointer',
+                                  color: 'grey.400',
+                                  transition: 'all 0.2s',
+                                  '&:hover': {
+                                    transform: 'scale(1.2)',
+                                    color: 'grey.300'
+                                  }
+                                }}
+                              >
+                                <CopyIcon sx={{ fontSize: 38 }} />
+                              </Box>
+                            </Stack>
+                          </Box>
                         </Box>
                       )}
 
-                      <Typography
-                        variant="h6"
-                        gutterBottom
-                        color="primary"
-                        sx={{ fontSize: { xs: '1rem', sm: '1.1rem' }, mt: 2 }}
-                      >
-                        🕐 Next Kwiz Coming Soon
-                      </Typography>
-                      <Typography
-                        variant="h5"
-                        gutterBottom
-                        sx={{
-                          fontSize: { xs: '1.2rem', sm: '1.4rem' },
-                          fontWeight: 600,
-                          mb: 2
-                        }}
-                      >
-                        {quizStatus.next_quiz.title}
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color="text.secondary"
-                        sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
-                      >
-                        See the countdown timer above for exact release time!
-                      </Typography>
+                      {quizStatus?.next_quiz && (
+                        <>
+                          <Typography
+                            variant="h6"
+                            gutterBottom
+                            color="primary"
+                            sx={{ fontSize: { xs: '1rem', sm: '1.1rem' }, mt: 2 }}
+                          >
+                            🕐 Next Kwiz Coming Soon
+                          </Typography>
+                          <Typography
+                            variant="h5"
+                            gutterBottom
+                            sx={{
+                              fontSize: { xs: '1.2rem', sm: '1.4rem' },
+                              fontWeight: 600,
+                              mb: 2
+                            }}
+                          >
+                            {quizStatus.next_quiz.title}
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            color="text.secondary"
+                            sx={{ fontSize: { xs: '0.9rem', sm: '1rem' } }}
+                          >
+                            See the countdown timer above for exact release time!
+                          </Typography>
+                        </>
+                      )}
+
+                      {!quizStatus?.next_quiz && (
+                        <Typography
+                          variant="body1"
+                          color="text.secondary"
+                          sx={{ fontSize: { xs: '0.9rem', sm: '1rem' }, mt: 2 }}
+                        >
+                          Check back tomorrow for the next Kwiz!
+                        </Typography>
+                      )}
                     </Box>
                   );
                 } else if (quizStatus?.next_quiz) {
@@ -607,6 +762,7 @@ function HomePage() {
             </CardContent>
           </Card>
         </Grid>
+
 
         {/* Archive Section */}
         <Grid item xs={12} md={4}>

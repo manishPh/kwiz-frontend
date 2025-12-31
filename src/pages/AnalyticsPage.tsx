@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import StatsDisplay from '../components/StatsDisplay';
 import { getFormattedStats } from '../utils/statsManager';
 
-function AnalyticsPage() {
+function AnalyticsPage(): React.JSX.Element {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));

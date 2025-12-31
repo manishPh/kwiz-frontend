@@ -14,11 +14,19 @@ import {
   Schedule as ScheduleIcon,
   Upcoming as UpcomingIcon
 } from '@mui/icons-material';
+import { NextQuizInfo } from '../services/api';
 
-function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }) {
+interface QuizTimerProps {
+  timeUntilRelease: number;
+  nextQuiz?: NextQuizInfo | null;
+  quizTitle?: string;
+  isAvailable: boolean;
+}
+
+function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizTimerProps): React.JSX.Element | null {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [timeLeft, setTimeLeft] = useState(timeUntilRelease || 0);
+  const [timeLeft, setTimeLeft] = useState<number>(timeUntilRelease || 0);
 
   useEffect(() => {
     setTimeLeft(timeUntilRelease || 0);
@@ -41,7 +49,7 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }) {
     return () => clearInterval(timer);
   }, [timeLeft, isAvailable]);
 
-  const formatTime = (seconds) => {
+  const formatTime = (seconds: number): string => {
     if (seconds <= 0) return '00:00:00';
 
     const hours = Math.floor(seconds / 3600);
@@ -51,7 +59,7 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }) {
     return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const getTimeMessage = () => {
+  const getTimeMessage = (): string | null => {
     if (isAvailable) return null;
 
     if (timeLeft <= 0) {
@@ -136,6 +144,9 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }) {
               {getTimeMessage()}
             </Typography>
           </Box>
+
+
+
 
           {/* Release Info */}
           <Stack

@@ -22,37 +22,37 @@ import {
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
 
-function ArchivePage() {
+function ArchivePage(): React.JSX.Element {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const [quizzes, setQuizzes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [quizzes, setQuizzes] = useState<any[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     loadArchive();
   }, []);
 
-  const loadArchive = async () => {
+  const loadArchive = async (): Promise<void> => {
     try {
       setLoading(true);
       const archiveData = await quizAPI.getArchive();
       setQuizzes(archiveData);
       setError(null);
-    } catch (err) {
+    } catch (err: any) {
       setError(err.error || 'Failed to load quiz archive');
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePlayQuiz = (date) => {
+  const handlePlayQuiz = (date: string): void => {
     navigate(`/quiz/${date}`);
   };
 
-  const formatDate = (dateString) => {
+  const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
       weekday: 'long',
@@ -62,7 +62,7 @@ function ArchivePage() {
     });
   };
 
-  const getRelativeDate = (dateString) => {
+  const getRelativeDate = (dateString: string): string => {
     const date = new Date(dateString);
     const today = new Date();
     const yesterday = new Date(today);
@@ -73,7 +73,7 @@ function ArchivePage() {
     } else if (date.toDateString() === yesterday.toDateString()) {
       return 'Yesterday';
     } else {
-      const diffTime = today - date;
+      const diffTime = today.getTime() - date.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
       return `${diffDays} days ago`;
     }

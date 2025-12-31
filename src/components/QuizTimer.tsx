@@ -81,9 +81,8 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizT
     <Card
       elevation={isMobile ? 2 : 3}
       sx={{
-        background: 'linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%)',
-        border: '2px solid',
-        borderColor: 'primary.light',
+        background: 'linear-gradient(135deg, #1a1a1a 0%, #2a2a2a 100%)',
+        border: '1px solid rgba(233, 30, 99, 0.3)',
         mb: { xs: 2, sm: 3 }
       }}
     >
@@ -96,13 +95,16 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizT
             spacing={1}
             justifyContent="center"
           >
-            <ScheduleIcon color="primary" />
+            <ScheduleIcon sx={{ color: '#e91e63' }} />
             <Typography
               variant="h6"
-              color="primary"
               sx={{
                 fontSize: { xs: '1.1rem', sm: '1.25rem' },
-                fontWeight: 600
+                fontWeight: 600,
+                background: 'linear-gradient(135deg, #e91e63 0%, #ff9800 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent'
               }}
             >
               Next Kwiz Coming Soon
@@ -116,7 +118,7 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizT
             sx={{
               fontSize: { xs: '1.2rem', sm: '1.4rem' },
               fontWeight: 700,
-              color: 'text.primary'
+              color: 'white'
             }}
           >
             {quizTitle || 'Upcoming Kwiz'}
@@ -129,7 +131,10 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizT
               sx={{
                 fontSize: { xs: '2rem', sm: '2.5rem', md: '3rem' },
                 fontWeight: 800,
-                color: 'primary.main',
+                background: 'linear-gradient(135deg, #e91e63 0%, #ff9800 100%)',
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
                 fontFamily: 'monospace',
                 letterSpacing: 2
               }}
@@ -138,15 +143,15 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizT
             </Typography>
             <Typography
               variant="body1"
-              color="text.secondary"
-              sx={{ mt: 1, fontSize: { xs: '0.9rem', sm: '1rem' } }}
+              sx={{
+                mt: 1,
+                fontSize: { xs: '0.9rem', sm: '1rem' },
+                color: 'rgba(255, 255, 255, 0.7)'
+              }}
             >
               {getTimeMessage()}
             </Typography>
           </Box>
-
-
-
 
           {/* Release Info */}
           <Stack
@@ -176,10 +181,10 @@ function QuizTimer({ timeUntilRelease, nextQuiz, quizTitle, isAvailable }: QuizT
           <Typography
             variant="body2"
             textAlign="center"
-            color="text.secondary"
             sx={{
               fontStyle: 'italic',
-              fontSize: { xs: '0.85rem', sm: '0.9rem' }
+              fontSize: { xs: '0.85rem', sm: '0.9rem' },
+              color: 'rgba(255, 255, 255, 0.6)'
             }}
           >
             🎬 Get ready for fresh trivia based on what's happening now!

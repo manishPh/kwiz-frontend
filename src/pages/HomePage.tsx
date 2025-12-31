@@ -57,7 +57,16 @@ function HomePage(): React.JSX.Element {
   const [loading, setLoading] = useState<boolean>(true);
   const [quizStatus, setQuizStatus] = useState<QuizStatus | null>(null);
 
-  const today = new Date().toISOString().split('T')[0];
+  // Get today's date in user's local timezone
+  // Users worldwide see the quiz for "their today" based on their local time
+  const getTodayLocal = (): string => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+  const today = getTodayLocal();
 
   // Social sharing functions
   const getScoreEmoji = (percentage: number): string => {
@@ -98,7 +107,12 @@ function HomePage(): React.JSX.Element {
   const getContextualBackground = (quiz: DailyQuiz | null): string | null => {
     if (!quiz) return null;
 
-    // You can expand this logic based on quiz themes, categories, or special events
+    // First priority: Use custom background_image from quiz config if provided
+    if (quiz.background_image) {
+      return quiz.background_image;
+    }
+
+    // Second priority: Category/theme-based backgrounds
     const category = quiz.category_name?.toLowerCase();
     const title = quiz.title?.toLowerCase();
 

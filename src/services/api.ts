@@ -36,6 +36,7 @@ export interface DailyQuiz {
   title: string;
   description: string;
   category_name: string;
+  background_image?: string | null;
   questions: Question[];
   time_until_release?: number;
   next_quiz?: NextQuizInfo | null;

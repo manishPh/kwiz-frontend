@@ -612,7 +612,7 @@ function HomePage(): React.JSX.Element {
                               alignItems="center"
                             >
                               <Box
-                                onClick={() => shareOnWhatsApp(results.score, results.total, results.percentage)}
+                                onClick={() => shareOnWhatsApp(results!.score, results!.total, results!.percentage)}
                                 sx={{
                                   cursor: 'pointer',
                                   color: '#25D366',
@@ -640,7 +640,7 @@ function HomePage(): React.JSX.Element {
                                 <FacebookIcon sx={{ fontSize: 38 }} />
                               </Box>
                               <Box
-                                onClick={() => shareOnInstagram(results.score, results.total, results.percentage)}
+                                onClick={() => shareOnInstagram(results!.score, results!.total, results!.percentage)}
                                 sx={{
                                   cursor: 'pointer',
                                   color: '#E4405F',
@@ -654,7 +654,7 @@ function HomePage(): React.JSX.Element {
                                 <InstagramIcon sx={{ fontSize: 38 }} />
                               </Box>
                               <Box
-                                onClick={() => copyToClipboard(results.score, results.total, results.percentage)}
+                                onClick={() => copyToClipboard(results!.score, results!.total, results!.percentage)}
                                 sx={{
                                   cursor: 'pointer',
                                   color: 'grey.400',

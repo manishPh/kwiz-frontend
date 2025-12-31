@@ -26,7 +26,6 @@ import {
 } from '@mui/icons-material';
 import StatsDisplay from '../components/StatsDisplay';
 import { getFormattedStats } from '../utils/statsManager';
-import { QuestionResult } from '../services/api';
 import {
   DOMAIN,
   SHARE_TEXT_SUFFIX,

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -12,7 +12,8 @@ import {
   Divider,
   useTheme,
   useMediaQuery,
-  Paper
+  Paper,
+  CircularProgress
 } from '@mui/material';
 import {
   Home as HomeIcon,
@@ -22,6 +23,7 @@ import {
 import StatsDisplay from '../components/StatsDisplay';
 import ShareButtons from '../components/ShareButtons';
 import { getFormattedStats } from '../utils/statsManager';
+import { quizAPI, DailyQuiz } from '../services/api';
 import {
   SCORE_EMOJI,
   SCORE_THRESHOLDS
@@ -33,14 +35,138 @@ function ResultsPage(): React.JSX.Element {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
-  const { results, quiz } = (location.state as any) || {};
+  const [results, setResults] = useState<any>(null);
+  const [quiz, setQuiz] = useState<DailyQuiz | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
   const userStats = getFormattedStats();
 
-  if (!results || !quiz) {
+  useEffect(() => {
+    const loadResults = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // First, try to get data from location.state (navigation from QuizPage)
+        const stateData = (location.state as any) || {};
+
+        if (stateData.results && stateData.quiz) {
+          // Data available from navigation state
+          setResults(stateData.results);
+          setQuiz(stateData.quiz);
+          setLoading(false);
+          return;
+        }
+
+        // If no state, try to find results in localStorage
+        // Check all possible dates in localStorage (look for quiz_results_* keys)
+        let today: string | null = null;
+        let storedFullResults: string | null = null;
+        let storedResults: string | null = null;
+
+        // Try to get today's date from server first
+        try {
+          const status = await quizAPI.getQuizStatus();
+          today = status.quiz_date;
+        } catch (err) {
+          // Server date not available, will search localStorage
+        }
+
+        // If we have today's date, try to load results for that date
+        if (today) {
+          storedFullResults = localStorage.getItem(`quiz_full_results_${today}`);
+          storedResults = localStorage.getItem(`quiz_results_${today}`);
+        }
+
+        // If we don't have a date or no results found, search all localStorage keys
+        if (!storedFullResults && !storedResults) {
+          for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key?.startsWith('quiz_full_results_')) {
+              storedFullResults = localStorage.getItem(key);
+              today = key.replace('quiz_full_results_', '');
+              break;
+            } else if (key?.startsWith('quiz_results_') && !key.includes('full')) {
+              storedResults = localStorage.getItem(key);
+              today = key.replace('quiz_results_', '');
+            }
+          }
+        }
+
+        // Try to use full results if available
+        if (storedFullResults) {
+          const fullData = JSON.parse(storedFullResults);
+          setResults(fullData.results);
+          setQuiz(fullData.quiz);
+          setLoading(false);
+          return;
+        }
+
+        // Fallback: Try basic results (without question-by-question data)
+        if (!storedResults || !today) {
+          setError('No results found for today. Please take today\'s kwiz first.');
+          setLoading(false);
+          return;
+        }
+
+        // Parse stored results
+        const parsedResults = JSON.parse(storedResults);
+
+        // Try to fetch quiz data from API to get questions for review
+        let quizData = null;
+        try {
+          quizData = await quizAPI.getDailyQuiz(today);
+        } catch (err) {
+          // Could not fetch quiz from API, will show results without question review
+        }
+
+        // Construct a basic results object from localStorage
+        setResults({
+          score: parsedResults.score,
+          total: parsedResults.total,
+          percentage: parsedResults.percentage,
+          share_text: `I scored ${parsedResults.score}/${parsedResults.total} (${parsedResults.percentage}%) on today's Kwiz!`,
+          results: [] // Empty array - we don't have question-by-question data
+        });
+
+        // Create a minimal quiz object if we couldn't fetch from API
+        if (quizData) {
+          setQuiz(quizData);
+        } else {
+          setQuiz({
+            date: today,
+            title: 'Quiz Results',
+            description: 'Your quiz results',
+            category_name: 'General',
+            questions: [],
+            background_image: null
+          } as DailyQuiz);
+        }
+
+        setLoading(false);
+      } catch (err: any) {
+        setError(err.error || 'Failed to load results. Please try again.');
+        setLoading(false);
+      }
+    };
+
+    loadResults();
+  }, [location.state]);
+
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+        <CircularProgress size={60} />
+      </Box>
+    );
+  }
+
+  if (error || !results || !quiz) {
     return (
       <Box>
         <Alert severity="error" sx={{ mb: 2 }}>
-          No results data found. Please take a kwiz first.
+          {error || 'No results data found. Please take a kwiz first.'}
         </Alert>
         <Button
           variant="contained"
@@ -195,64 +321,68 @@ function ResultsPage(): React.JSX.Element {
       <StatsDisplay stats={userStats} compact={true} />
 
       {/* Question Review */}
-      <Typography variant="h6" gutterBottom>
-        Question Review
-      </Typography>
+      {results.results && results.results.length > 0 && (
+        <>
+          <Typography variant="h6" gutterBottom>
+            Question Review
+          </Typography>
 
-      {results.results.map((result: any, index: number) => {
-        const question = quiz.questions.find((q: any) => q.id === result.question_id);
-        if (!question) return null;
+          {results.results.map((result: any, index: number) => {
+            const question = quiz.questions.find((q: any) => q.id === result.question_id);
+            if (!question) return null;
 
-        // Backend returns user_answer and correct_answer as actual values, not option letters
-        const userAnswer = result.user_answer || result.selected_option || '';
-        const correctAnswer = result.correct_answer;
-        const isCorrect = result.correct !== undefined ? result.correct : result.is_correct;
+            // Backend returns user_answer and correct_answer as actual values, not option letters
+            const userAnswer = result.user_answer || result.selected_option || '';
+            const correctAnswer = result.correct_answer;
+            const isCorrect = result.correct !== undefined ? result.correct : result.is_correct;
 
-        return (
-          <Card key={result.question_id} elevation={1} sx={{ mb: 2 }}>
-            <CardContent>
-              <Box display="flex" alignItems="flex-start" gap={2}>
-                {isCorrect ? (
-                  <CorrectIcon color="success" />
-                ) : (
-                  <WrongIcon color="error" />
-                )}
-
-                <Box flex={1}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    Q{index + 1}: {question.text}
-                  </Typography>
-
-                  <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6}>
-                      <Typography variant="body2" color="text.secondary">
-                        Your answer:
-                      </Typography>
-                      <Typography
-                        variant="body1"
-                        color={isCorrect ? 'success.main' : 'error.main'}
-                      >
-                        {userAnswer || 'Not answered'}
-                      </Typography>
-                    </Grid>
-
-                    {!isCorrect && (
-                      <Grid item xs={12} sm={6}>
-                        <Typography variant="body2" color="text.secondary">
-                          Correct answer:
-                        </Typography>
-                        <Typography variant="body1" color="success.main">
-                          {correctAnswer}
-                        </Typography>
-                      </Grid>
+            return (
+              <Card key={result.question_id} elevation={1} sx={{ mb: 2 }}>
+                <CardContent>
+                  <Box display="flex" alignItems="flex-start" gap={2}>
+                    {isCorrect ? (
+                      <CorrectIcon color="success" />
+                    ) : (
+                      <WrongIcon color="error" />
                     )}
-                  </Grid>
-                </Box>
-              </Box>
-            </CardContent>
-          </Card>
-        );
-      })}
+
+                    <Box flex={1}>
+                      <Typography variant="subtitle1" gutterBottom>
+                        Q{index + 1}: {question.text}
+                      </Typography>
+
+                      <Grid container spacing={2}>
+                        <Grid item xs={12} sm={6}>
+                          <Typography variant="body2" color="text.secondary">
+                            Your answer:
+                          </Typography>
+                          <Typography
+                            variant="body1"
+                            color={isCorrect ? 'success.main' : 'error.main'}
+                          >
+                            {userAnswer || 'Not answered'}
+                          </Typography>
+                        </Grid>
+
+                        {!isCorrect && (
+                          <Grid item xs={12} sm={6}>
+                            <Typography variant="body2" color="text.secondary">
+                              Correct answer:
+                            </Typography>
+                            <Typography variant="body1" color="success.main">
+                              {correctAnswer}
+                            </Typography>
+                          </Grid>
+                        )}
+                      </Grid>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </>
+      )}
 
       <Divider sx={{ my: 3 }} />
 

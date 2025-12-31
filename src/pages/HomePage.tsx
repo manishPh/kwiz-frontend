@@ -194,6 +194,7 @@ function HomePage(): React.JSX.Element {
   const resetQuizCompletion = (): void => {
     localStorage.removeItem(`quiz_completed_${today}`);
     localStorage.removeItem(`quiz_results_${today}`);
+    localStorage.removeItem(`quiz_full_results_${today}`);
     console.log('Reset quiz completion status and results');
     loadTodayQuiz(); // Reload to show quiz
   };

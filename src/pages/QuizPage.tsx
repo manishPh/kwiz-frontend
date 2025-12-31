@@ -109,6 +109,13 @@ function QuizPage(): React.JSX.Element {
         completedAt: new Date().toISOString()
       }));
 
+      // Store full results and quiz data for ResultsPage (in case of direct URL access)
+      localStorage.setItem(`quiz_full_results_${date}`, JSON.stringify({
+        results,
+        quiz,
+        answers
+      }));
+
       // Update comprehensive stats
       const updatedStats = updateStatsAfterQuiz(results, date, quiz.category_name);
       console.log(`Marked quiz as completed for ${date} with score ${results.score}/${results.total}`);

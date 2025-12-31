@@ -162,7 +162,7 @@ const theme = createTheme({
           boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.25)',
           transition: 'all 0.3s ease',
           '&:hover': {
-            transform: 'translateY(-4px)',
+            transform: 'translateY(-2px)',
             boxShadow: '0 12px 40px 0 rgba(233, 30, 99, 0.3)',
             border: '1px solid rgba(233, 30, 99, 0.4)',
           },

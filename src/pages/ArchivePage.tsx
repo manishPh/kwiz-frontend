@@ -157,7 +157,7 @@ function ArchivePage(): React.JSX.Element {
                   transition: 'transform 0.2s, box-shadow 0.2s',
                   borderRadius: { xs: 2, sm: 3 },
                   '&:hover': {
-                    transform: 'translateY(-4px)',
+                    transform: 'translateY(-2px)',
                     boxShadow: isMobile ? 3 : 6
                   }
                 }}

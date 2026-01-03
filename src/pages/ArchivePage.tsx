@@ -21,6 +21,7 @@ import {
   AccessTime as TimeIcon
 } from '@mui/icons-material';
 import { quizAPI } from '../services/api';
+import { analytics } from '../services/analytics';
 
 function ArchivePage(): React.JSX.Element {
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ function ArchivePage(): React.JSX.Element {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    analytics.archiveViewed();
     loadArchive();
   }, []);
 
@@ -49,6 +51,7 @@ function ArchivePage(): React.JSX.Element {
   };
 
   const handlePlayQuiz = (date: string): void => {
+    analytics.archiveQuizSelected(date);
     navigate(`/quiz/${date}`);
   };
 

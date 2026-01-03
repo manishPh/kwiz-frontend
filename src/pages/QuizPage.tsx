@@ -27,6 +27,7 @@ import {
 } from '@mui/icons-material';
 import { quizAPI, DailyQuiz } from '../services/api';
 import { updateStatsAfterQuiz } from '../utils/statsManager';
+import { analytics } from '../services/analytics';
 
 interface AnswersMap {
   [questionId: string]: string;
@@ -53,6 +54,9 @@ function QuizPage(): React.JSX.Element {
       const quizData = await quizAPI.getDailyQuiz(date);
       setQuiz(quizData);
       setError(null);
+
+      // Track quiz started
+      analytics.quizStarted(date, quizData.category_name || 'Unknown');
     } catch (err: any) {
       setError(err.error || 'Failed to load quiz');
     } finally {
@@ -120,6 +124,9 @@ function QuizPage(): React.JSX.Element {
       const updatedStats = updateStatsAfterQuiz(results, date, quiz.category_name);
       console.log(`Marked quiz as completed for ${date} with score ${results.score}/${results.total}`);
       console.log('Updated stats:', updatedStats);
+
+      // Track quiz completion
+      analytics.quizCompleted(date, results.score, results.total);
 
       // Navigate to results page with data
       navigate('/results', {

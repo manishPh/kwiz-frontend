@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   Box,
   Typography,
@@ -18,12 +18,17 @@ import {
 import { useNavigate } from 'react-router-dom';
 import StatsDisplay from '../components/StatsDisplay';
 import { getFormattedStats } from '../utils/statsManager';
+import { analytics } from '../services/analytics';
 
 function AnalyticsPage(): React.JSX.Element {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const userStats = getFormattedStats();
+
+  useEffect(() => {
+    analytics.analyticsViewed();
+  }, []);
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 2, sm: 4 } }}>

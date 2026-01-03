@@ -310,6 +310,7 @@ function ResultsPage(): React.JSX.Element {
           <Box sx={{ mt: 2 }}>
             <ShareButtons
               shareText={results.share_text}
+              score={results.score}
               iconSize={isMobile ? 36 : 42}
               spacing={isMobile ? 2 : 3}
             />

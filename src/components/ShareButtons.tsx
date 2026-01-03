@@ -13,27 +13,32 @@ import {
   SHARE_CLIPBOARD_SUCCESS,
   SHARE_INSTAGRAM_INSTRUCTION
 } from '../constants';
+import { analytics } from '../services/analytics';
 
 interface ShareButtonsProps {
   shareText: string;
+  score?: number;
   iconSize?: number;
   spacing?: number;
 }
 
-function ShareButtons({ shareText, iconSize = 38, spacing = 3 }: ShareButtonsProps): React.JSX.Element {
+function ShareButtons({ shareText, score = 0, iconSize = 38, spacing = 3 }: ShareButtonsProps): React.JSX.Element {
   const shareOnWhatsApp = (): void => {
+    analytics.shareClicked('WhatsApp', score);
     const text = encodeURIComponent(shareText + SHARE_TEXT_SUFFIX);
     const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${text}`;
     window.open(url, '_blank');
   };
 
   const shareOnFacebook = (): void => {
+    analytics.shareClicked('Facebook', score);
     const text = encodeURIComponent(shareText + SHARE_TEXT_SUFFIX);
     const url = `${SOCIAL_MEDIA.FACEBOOK.SHARE_URL}u=${encodeURIComponent(window.location.origin)}&quote=${text}`;
     window.open(url, '_blank');
   };
 
   const shareOnInstagram = (): void => {
+    analytics.shareClicked('Instagram', score);
     // Copy to clipboard and open Instagram
     const text = shareText + SHARE_TEXT_INSTAGRAM_SUFFIX;
     navigator.clipboard.writeText(text).then(() => {
@@ -50,6 +55,7 @@ function ShareButtons({ shareText, iconSize = 38, spacing = 3 }: ShareButtonsPro
   };
 
   const copyToClipboard = (): void => {
+    analytics.shareClicked('Copy', score);
     const text = shareText + SHARE_TEXT_SUFFIX;
     navigator.clipboard.writeText(text);
     alert(SHARE_CLIPBOARD_SUCCESS);

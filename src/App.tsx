@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Container, AppBar, Toolbar, Typography, Box, useTheme, useMediaQuery, IconButton, Tooltip } from '@mui/material';
 import {
@@ -13,12 +13,23 @@ import ResultsPage from './pages/ResultsPage';
 import ArchivePage from './pages/ArchivePage';
 import AnalyticsPage from './pages/AnalyticsPage';
 import { DOMAIN, APP_FULL_NAME } from './constants';
+import { analytics } from './services/analytics';
 
 function App(): React.JSX.Element {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Initialize Google Analytics on app load
+  useEffect(() => {
+    analytics.init();
+  }, []);
+
+  // Track page views on route change
+  useEffect(() => {
+    analytics.pageView(location.pathname + location.search);
+  }, [location]);
 
   return (
     <Box sx={{

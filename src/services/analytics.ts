@@ -23,8 +23,7 @@ export const analytics = {
     ReactGA.event({
       category: 'Quiz',
       action: 'Started',
-      label: quizDate,
-      value: category,
+      label: `${quizDate} - ${category}`,
     });
   },
 

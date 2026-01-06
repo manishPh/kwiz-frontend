@@ -37,6 +37,7 @@ interface QuizResults {
   total: number;
   percentage: number;
   completedAt: string;
+  share_text?: string; // Optional - from API response
 }
 
 function HomePage(): React.JSX.Element {
@@ -533,11 +534,17 @@ function HomePage(): React.JSX.Element {
                 const hasCompletedToday = localStorage.getItem(`quiz_completed_${today}`) === 'true';
 
                 if (hasCompletedToday) {
-                  // Get stored quiz results
-                  const storedResults = localStorage.getItem(`quiz_results_${today}`);
+                  // Get stored quiz results - try full results first (has share_text), fallback to basic
+                  const storedFullResults = localStorage.getItem(`quiz_full_results_${today}`);
+                  const storedBasicResults = localStorage.getItem(`quiz_results_${today}`);
                   let results: QuizResults | null = null;
                   try {
-                    results = storedResults ? JSON.parse(storedResults) : null;
+                    if (storedFullResults) {
+                      const fullData = JSON.parse(storedFullResults);
+                      results = fullData.results; // This has share_text from API
+                    } else if (storedBasicResults) {
+                      results = JSON.parse(storedBasicResults);
+                    }
                   } catch (e) {
                     console.error('Error parsing stored results:', e);
                   }
@@ -598,7 +605,8 @@ function HomePage(): React.JSX.Element {
                               Share your score:
                             </Typography>
                             <ShareButtons
-                              shareText={getShareText(results!.score, results!.total, results!.percentage)}
+                              shareText={results!.share_text || getShareText(results!.score, results!.total, results!.percentage)}
+                              score={results!.score}
                               iconSize={38}
                               spacing={3}
                             />

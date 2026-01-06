@@ -37,7 +37,9 @@ interface QuizResults {
   total: number;
   percentage: number;
   completedAt: string;
-  share_text?: string; // Optional - from API response
+  quiz_date?: string;
+  quiz_title?: string;
+  category?: string;
 }
 
 function HomePage(): React.JSX.Element {
@@ -60,20 +62,7 @@ function HomePage(): React.JSX.Element {
   };
   const today = serverToday || getTodayLocal(); // Use server's date if available, fallback to local
 
-  // Helper function to get score emoji
-  const getScoreEmoji = (percentage: number): string => {
-    if (percentage >= SCORE_THRESHOLDS.EXCELLENT) return SCORE_EMOJI.EXCELLENT;
-    if (percentage >= SCORE_THRESHOLDS.GREAT) return SCORE_EMOJI.GREAT;
-    if (percentage >= SCORE_THRESHOLDS.GOOD) return SCORE_EMOJI.GOOD;
-    if (percentage >= SCORE_THRESHOLDS.OKAY) return SCORE_EMOJI.OKAY;
-    return SCORE_EMOJI.TRY_AGAIN;
-  };
 
-  // Helper function to generate share text
-  const getShareText = (score: number, total: number, percentage: number): string => {
-    const emoji = getScoreEmoji(percentage);
-    return `${emoji} I scored ${score}/${total} (${percentage}%) on today's Kwiz!`;
-  };
 
   // Helper function to get contextual background image based on quiz category/theme
   const getContextualBackground = (quiz: DailyQuiz | null): string | null => {
@@ -605,7 +594,13 @@ function HomePage(): React.JSX.Element {
                               Share your score:
                             </Typography>
                             <ShareButtons
-                              shareText={results!.share_text || getShareText(results!.score, results!.total, results!.percentage)}
+                              shareData={{
+                                score: results!.score,
+                                total: results!.total,
+                                percentage: results!.percentage,
+                                quiz_date: results!.quiz_date || today,
+                                quiz_title: results!.quiz_title
+                              }}
                               score={results!.score}
                               iconSize={38}
                               spacing={3}

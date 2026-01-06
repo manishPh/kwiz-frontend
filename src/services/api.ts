@@ -74,7 +74,9 @@ export interface QuizSubmissionResponse {
   total: number;
   percentage: number;
   results: QuestionResult[];
-  share_text: string;
+  quiz_date: string;
+  quiz_title: string;
+  category: string;
 }
 
 export interface ArchiveQuiz {

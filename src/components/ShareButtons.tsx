@@ -14,25 +14,30 @@ import {
   SHARE_INSTAGRAM_INSTRUCTION
 } from '../constants';
 import { analytics } from '../services/analytics';
+import { generateShareText, ShareTextData } from '../utils/shareText';
 
 interface ShareButtonsProps {
-  shareText: string;
+  // Accept data to generate share text, or pre-formatted text for backward compatibility
+  shareData?: ShareTextData;
+  shareText?: string;
   score?: number;
   iconSize?: number;
   spacing?: number;
 }
 
-function ShareButtons({ shareText, score = 0, iconSize = 38, spacing = 3 }: ShareButtonsProps): React.JSX.Element {
+function ShareButtons({ shareData, shareText, score = 0, iconSize = 38, spacing = 3 }: ShareButtonsProps): React.JSX.Element {
+  // Generate share text from data if provided, otherwise use pre-formatted text
+  const finalShareText = shareData ? generateShareText(shareData) : (shareText || '');
   const shareOnWhatsApp = (): void => {
     analytics.shareClicked('WhatsApp', score);
-    const text = encodeURIComponent(shareText + SHARE_TEXT_SUFFIX);
+    const text = encodeURIComponent(finalShareText + SHARE_TEXT_SUFFIX);
     const url = `${SOCIAL_MEDIA.WHATSAPP.SHARE_URL}${text}`;
     window.open(url, '_blank');
   };
 
   const shareOnFacebook = (): void => {
     analytics.shareClicked('Facebook', score);
-    const text = encodeURIComponent(shareText + SHARE_TEXT_SUFFIX);
+    const text = encodeURIComponent(finalShareText + SHARE_TEXT_SUFFIX);
     const url = `${SOCIAL_MEDIA.FACEBOOK.SHARE_URL}u=${encodeURIComponent(window.location.origin)}&quote=${text}`;
     window.open(url, '_blank');
   };
@@ -40,7 +45,7 @@ function ShareButtons({ shareText, score = 0, iconSize = 38, spacing = 3 }: Shar
   const shareOnInstagram = (): void => {
     analytics.shareClicked('Instagram', score);
     // Copy to clipboard and open Instagram
-    const text = shareText + SHARE_TEXT_INSTAGRAM_SUFFIX;
+    const text = finalShareText + SHARE_TEXT_INSTAGRAM_SUFFIX;
     navigator.clipboard.writeText(text).then(() => {
       // Open Instagram in a new tab
       const instagramWindow = window.open(SOCIAL_MEDIA.INSTAGRAM.URL, '_blank');
@@ -56,7 +61,7 @@ function ShareButtons({ shareText, score = 0, iconSize = 38, spacing = 3 }: Shar
 
   const copyToClipboard = (): void => {
     analytics.shareClicked('Copy', score);
-    const text = shareText + SHARE_TEXT_SUFFIX;
+    const text = finalShareText + SHARE_TEXT_SUFFIX;
     navigator.clipboard.writeText(text);
     alert(SHARE_CLIPBOARD_SUCCESS);
   };

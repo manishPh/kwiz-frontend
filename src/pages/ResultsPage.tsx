@@ -24,6 +24,7 @@ import StatsDisplay from '../components/StatsDisplay';
 import ShareButtons from '../components/ShareButtons';
 import { getFormattedStats } from '../utils/statsManager';
 import { quizAPI, DailyQuiz } from '../services/api';
+import { generateShareText } from '../utils/shareText';
 import {
   SCORE_EMOJI,
   SCORE_THRESHOLDS
@@ -300,16 +301,29 @@ function ResultsPage(): React.JSX.Element {
                 fontSize: { xs: '0.85rem', sm: '0.875rem' },
                 fontFamily: 'monospace',
                 textAlign: 'center',
-                color: 'rgba(255, 255, 255, 0.9)'
+                color: 'rgba(255, 255, 255, 0.9)',
+                whiteSpace: 'pre-line'
               }}
             >
-              {results.share_text}
+              {generateShareText({
+                score: results.score,
+                total: results.total,
+                percentage: results.percentage,
+                quiz_date: results.quiz_date || quiz.date,
+                quiz_title: results.quiz_title || quiz.title
+              })}
             </Typography>
           </Paper>
 
           <Box sx={{ mt: 2 }}>
             <ShareButtons
-              shareText={results.share_text}
+              shareData={{
+                score: results.score,
+                total: results.total,
+                percentage: results.percentage,
+                quiz_date: results.quiz_date || quiz.date,
+                quiz_title: results.quiz_title || quiz.title
+              }}
               score={results.score}
               iconSize={isMobile ? 36 : 42}
               spacing={isMobile ? 2 : 3}

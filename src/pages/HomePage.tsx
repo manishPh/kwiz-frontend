@@ -27,9 +27,7 @@ import ShareButtons from '../components/ShareButtons';
 import {
   UI_TEXT,
   QUIZ_TIMER_LABEL,
-  QUIZ_NEW_BADGE,
-  SCORE_EMOJI,
-  SCORE_THRESHOLDS
+  QUIZ_NEW_BADGE
 } from '../constants';
 
 interface QuizResults {

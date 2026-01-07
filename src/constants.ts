@@ -69,8 +69,8 @@ export const SCORE_THRESHOLDS: ScoreThresholds = {
 // ============================================================================
 // SHARE TEXT TEMPLATES
 // ============================================================================
-export const SHARE_TEXT_SUFFIX: string = `\n\nPlay daily Bollywood trivia at ${DOMAIN} 🎬`;
-export const SHARE_TEXT_INSTAGRAM_SUFFIX: string = `\n\nPlay daily Bollywood trivia at ${DOMAIN} 🎬✨`;
+export const SHARE_TEXT_SUFFIX: string = `\n\nPlay daily Bollywood trivia at ${DOMAIN_URL} 🎬`;
+export const SHARE_TEXT_INSTAGRAM_SUFFIX: string = `\n\nPlay daily Bollywood trivia at ${DOMAIN_URL} 🎬✨`;
 export const SHARE_CLIPBOARD_SUCCESS: string = 'Results copied to clipboard!';
 export const SHARE_INSTAGRAM_INSTRUCTION: string = 'Text copied to clipboard! Open Instagram and paste in your story or post.';
 

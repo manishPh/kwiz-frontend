@@ -3,7 +3,7 @@
  * All share text formatting logic lives here
  */
 
-import { DOMAIN, SCORE_EMOJI, SCORE_THRESHOLDS } from '../constants';
+import { DOMAIN_URL, SCORE_EMOJI, SCORE_THRESHOLDS } from '../constants';
 
 export interface ShareTextData {
   score: number;
@@ -40,13 +40,13 @@ export function formatDateForShare(dateString: string): string {
 export function generateShareText(data: ShareTextData): string {
   const emoji = getScoreEmoji(data.percentage);
   const formattedDate = formatDateForShare(data.quiz_date);
-  const quizUrl = `${DOMAIN}/quiz/${data.quiz_date}`;
-  
+  const quizUrl = `${DOMAIN_URL}/quiz/${data.quiz_date}`;
+
   // Use title if available, otherwise use date format
-  const firstLine = data.quiz_title 
+  const firstLine = data.quiz_title
     ? `🎬 ${data.quiz_title} 🎬`
     : `🎬 Bollywood Kwiz #${formattedDate} 🎬`;
-  
+
   return `${firstLine}
 ${emoji} ${data.score}/${data.total} (${data.percentage}%)
 
